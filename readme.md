@@ -1,4 +1,4 @@
-# 🌸 Sahit — Empowering Women Through Technology
+# Sahit — Empowering Women Through Technology
 
 **Sahit** is a real-world women empowerment platform developed and maintained under **InMobi**. It connects women in need with verified NGOs offering legal, medical, emotional, and employment assistance. Sahit is designed with safety, clarity, and trust at its core, featuring dedicated dashboards for women, NGOs, and super administrators.
 
@@ -12,20 +12,20 @@
 
 ## 🚀 Features
 
-### 👩 Women Dashboard
+### Women Dashboard
 - Submit detailed help requests (multi-step form)
 - View request status and history
 - Accept or decline NGO offers
 - Chat securely with NGO volunteers
 - Track progress of ongoing help
 
-### 🏢 NGO Dashboard
+### NGO Dashboard
 - View incoming help requests relevant to their domain/location
 - Accept, view, and manage assigned requests
 - Contact women via preferred modes (WhatsApp, Call, In-app)
 - Status tracking and performance analytics
 
-### 🛡️ Super Admin Panel
+### Super Admin Panel
 - Monitor all activity across the platform
 - Approve, deactivate, or verify NGOs
 - View analytics on requests, response rates, and impact
@@ -41,7 +41,7 @@
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Frontend
 - **Next.js** (App Router)
@@ -62,7 +62,7 @@
 
 ---
 
-## 🧩 Matching Logic (Behind the Scenes)
+## Matching Logic (Behind the Scenes)
 
 1. Woman submits a help request.
 2. The request is added to a **Redis queue**.
@@ -72,7 +72,7 @@
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 > - Woman Dashboard  
 > - NGO Dashboard  
