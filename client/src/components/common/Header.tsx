@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { setIsMobileNavOpen } from "@/store/features/NavigationSlice";
@@ -13,13 +13,13 @@ const Header = () => {
 
   return (
     <header className="border-b backdrop-blur-xl top-0 z-20">
-      <div className="flex items-center justify-between px-4 py-5 md:px-8">
+      <div className="flex items-center justify-between px-4 py-5 lg:px-10">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => dispatch(setIsMobileNavOpen(!isOpen))}
-            className="md:hidden text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
+            className="lg:hidden text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
           >
             <MenuIcon className="h-5 w-5" />
           </Button>

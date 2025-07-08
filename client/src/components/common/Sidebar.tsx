@@ -45,14 +45,14 @@ const Sidebar = () => {
     <>
       {isMobileNavOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-40 md:hidden"
+          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
           onClick={() => dispatch(closeMobileNav())}
         />
       )}
 
       <div
         className={cn(
-          "fixed flex flex-col z-50 border-r bg-[#F7F8FA] w-64 p-7 justify-between md:inset-y-0 bottom-0 left-0 backdrop-blur-xl transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:top-0",
+          "fixed flex flex-col z-50 border-r bg-[#F7F8FA] w-64 p-7 justify-between lg:inset-y-0 bottom-0 left-0 backdrop-blur-xl transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 top-0",
           isMobileNavOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -85,7 +85,7 @@ const Sidebar = () => {
           })}
         </div>
 
-        <div className="mt-80">
+        <div className="mt-70 lg:mt-80">
           <Link
             href="/settings"
             className="flex gap-2 text-sm text-neutral-600 bg-transparent hover:bg-neutral-200 transition px-4 py-3 rounded"
