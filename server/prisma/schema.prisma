@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String       @id @default(uuid())
+  email      String       @unique
+  password   String
+  role       UserRole
+  createdAt  DateTime     @default(now())
+
+  ngo         NGO?
+  helpSeeker  HelpSeeker?
+}
+
+model NGO {
+  id               String      @id @default(uuid())
+  name             String
+  replyTimeMins    Int    
+  supportTypes     HelpType[]
+  location         String
+  rating           Float       @default(0)
+  feedbacks        Feedback[]
+  createdAt        DateTime    @default(now())
+  email            String      @unique
+  phone            String
+  whatsappSame     Boolean     @default(true)
+  whatsappNumber   String?
+  about            String
+
+  representativeName       String
+  representativeTitle      String
+  representativeAvailability String
+
+  verifiedDocs     String[]   
+  isVerified       Boolean    @default(false)
+
+  helpRequests     HelpRequest[]
+
+  user            User        @relation(fields: [userId], references: [id])
+  userId          String      @unique
+}
+
+model HelpSeeker {
+  id          String     @id @default(uuid())
+  name        String
+  age         Int
+  location    String
+  contact     String
+  email       String?
+  company     String?
+  jobType     String?
+  photo       String?
+  occupation  String?
+  whatsappSame Boolean   @default(true)
+  whatsapp    String?
+  isVerified  Boolean    @default(false)
+  alias       String
+  idProofs    String[]   
+
+  helpRequests HelpRequest[]
+  feedbacks    Feedback[]
+
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String     @unique
+}
+
+model Feedback {
+  id        String     @id @default(uuid())
+  ngo       NGO        @relation(fields: [ngoId], references: [id])
+  ngoId     String
+  user      HelpSeeker @relation(fields: [userId], references: [id])
+  userId    String
+  rating    Int 
+  content   String
+  createdAt DateTime   @default(now())
+}
+
+model HelpRequest {
+  id           String      @id @default(uuid())
+  user         HelpSeeker  @relation(fields: [userId], references: [id])
+  userId       String
+  helpType     HelpType
+  title        String
+  description  String
+  attachments  String[]
+  hideId       Boolean     @default(false)
+  hideFace     Boolean     @default(false)
+  hideName     Boolean     @default(false)
+
+  urgency      HelpUrgency
+  status       HelpStatus  @default(PENDING)
+
+  assignedNGO  NGO?        @relation(fields: [ngoId], references: [id])
+  ngoId        String?
+
+  submittedAt  DateTime    @default(now())
+}
+
+enum HelpType {
+  LEGAL
+  SHELTER
+  COUNSELLING
+  FINANCIAL
+  OTHER
+}
+
+enum HelpUrgency {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum HelpStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  DECLINED
+}
+
+enum UserRole {
+  NGO
+  HELP_SEEKER
+  ADMIN
+}

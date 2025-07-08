@@ -21,7 +21,7 @@ const HomePage = () => {
           <div className="h-full relative rounded-lg overflow-hidden">
             <div className="relative h-full bg-[url('/support-bg.png')] bg-cover bg-center text-white p-6 rounded-lg">
               <p>Here to Connect you with Help!</p>
-              <h2 className="text-xl lg:text-2xl font-semibold mt-2">
+              <h2 className="text-xl 2xl:text-2xl font-semibold mt-2">
                 Hey, you have 1 new notification and 2 new requests.
               </h2>
               <Button className="bg-white text-black px-10 py-5 mt-5 cursor-pointer hover:bg-neutral-200 transition-colors ease-in-out duration-300">
