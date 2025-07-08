@@ -87,5 +87,6 @@
 ```bash
 git clone https://github.com/yourusername/sahit-platform.git
 cd sahit-platform
+```
 
 > **Ownership**: This platform is developed, managed, and maintained by **InMobi** as part of its ongoing commitment to social impact and responsible innovation.
