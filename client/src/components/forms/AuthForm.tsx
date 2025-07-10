@@ -59,7 +59,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
         }).unwrap()
 
         toast.success('Signed up Successfully');
-        router.push('/onboarding/details');
+        router.push('/sign-in');
       } else {
         const res = await signIn("credentials", {
           email: values.email,

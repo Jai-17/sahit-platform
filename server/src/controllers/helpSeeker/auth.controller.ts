@@ -1,8 +1,8 @@
-import { prisma } from "../db";
+import { prisma } from "../../db";
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { addMinutes } from "date-fns";
-import { sendVerificationEmail } from "../utils/email.config";
+import { sendVerificationEmail } from "../../utils/email.config";
 
 export const signUp = async (req: Request, res: Response): Promise<void> => {
   const { name, email, password } = req.body;
@@ -197,4 +197,8 @@ export const oauthSync = async (req: Request, res: Response): Promise<void> => {
           .status(500)
           .json({ success: false, message: "Internal server error", error: error });
     }
+}
+
+export const registerHelpSeeker = async (req: Request, res: Response): Promise<void> => {
+  
 }

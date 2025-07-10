@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { oauthSync, resendOtp, signIn, signUp, verifyEmail } from "../controllers/auth.controller";
+import { oauthSync, resendOtp, signIn, signUp, verifyEmail } from "../../controllers/helpSeeker/auth.controller";
 
 const router = Router();
 

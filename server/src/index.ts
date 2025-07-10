@@ -4,8 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 
-/* ROUTE IMPORTS */
-import authRoutes from './routes/auth.routes';
+/* ROUTE IMPORTS HELP SEEKER */
+import authRoutes from './routes/helpSeeker/auth.routes';
 
 dotenv.config();
 const app = express();
@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 })
 
 // Help Seeker Routes
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/help/auth', authRoutes);
 
 const port = Number(process.env.PORT) || 8000;
 app.listen(port, "0.0.0.0", () => {

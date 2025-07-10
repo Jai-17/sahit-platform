@@ -7,7 +7,7 @@ export const apiSlice = createApi({
         // AUTH
         signUp: builder.mutation<SignUpData, SignUpData>({
             query: (userData) => ({
-                url: '/api/v1/auth/signup',
+                url: '/api/v1/help/auth/signup',
                 method: 'POST',
                 body: userData,
             })
