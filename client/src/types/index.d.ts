@@ -6,6 +6,17 @@ enum UserRole {
     ADMIN = "ADMIN",
 }
 
+interface SignUpData {
+    name: string;
+    email: string;
+    password: string;
+}
+
+interface SignInData {
+    email: string;
+    password: string;
+}
+
 interface User {
     id: string;
     name: string;

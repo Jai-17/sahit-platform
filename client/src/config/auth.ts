@@ -71,7 +71,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     async signIn({ account, user }) {
       if (account?.provider === "google") {
-        await axios.post(`${process.env.BACKEND_URL}/api/v1/auth/oauth-sync`, {
+        await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/oauth-sync`, {
           email: user.email,
           name: user.name,
         });

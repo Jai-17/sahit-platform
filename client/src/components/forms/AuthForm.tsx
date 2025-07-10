@@ -11,21 +11,35 @@ import Link from "next/link";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useSignUpMutation } from "@/store/features/apiSlice";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
-    name: type === "sign-up" ? z.string().min(3) : z.string().optional(),
-    email: z.string().email(),
-    password: z.string().min(3),
+    name:
+      type === "sign-up"
+        ? z.string().min(3, { message: "Must contain at least 3 characters" })
+        : z.string().optional(),
+    email: z.string().email({ message: "Invalid email address" }),
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters" })
+      .regex(/[A-Z]/, {
+        message: "Must contain at least one uppercase character",
+      })
+      .regex(/[0-9]/, { message: "Must contain at least one number" })
+      .regex(/[^A-Za-z0-9]/, { message: "Must contain at least one symbol" }),
   });
 };
 
 const AuthForm = ({ type }: { type: FormType }) => {
   const router = useRouter();
   const isSignIn = type === "sign-in";
+  const [signUp, {isLoading}] = useSignUpMutation();
   const formSchema = authFormSchema(type);
+  type AuthFormData = z.infer<ReturnType<typeof authFormSchema>>;
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<AuthFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
@@ -35,18 +49,35 @@ const AuthForm = ({ type }: { type: FormType }) => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(type);
     try {
-      const res = await signIn("credentials", {
-        email: values.email,
-        password: values.password,
-        redirect: false,
-      });
+      if (type === "sign-up") {
+        await signUp({
+          name: values.name as string,
+          email: values.email,
+          password: values.password
+        }).unwrap()
 
-      if (res && res.ok && res.url) {
-        router.push('/');
+        toast.success('Signed up Successfully');
+        router.push('/onboarding/details');
+      } else {
+        const res = await signIn("credentials", {
+          email: values.email,
+          password: values.password,
+          redirect: false,
+        });
+
+        if (res && res.ok) {
+          toast.success('Signed in successfully!');
+          router.push("/");
+        } else {
+          toast.error(`Sign in Failed: ${res.error}`);
+        }
       }
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.log(error);
+      toast.error(`There was an error: ${error.data.message}`);
     }
   }
 
@@ -54,7 +85,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
     signIn("google", {
       callbackUrl: "/",
       redirect: true,
-    })
+    });
   }
 
   return (
@@ -99,7 +130,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
             type="submit"
             className="w-full min-h-10 bg-[#8300EA] mt-2 hover:bg-[#8300EA95] transition duration-300 cursor-pointer ease-in"
           >
-            {isSignIn ? "Sign In" : "Create an Account"}
+            {isSignIn ? "Sign In" : (isLoading ? 'Submitting...' : 'Create an Account')}
           </Button>
         </form>
       </Form>

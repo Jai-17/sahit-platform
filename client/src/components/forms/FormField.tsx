@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Control, Controller, FieldValues, Path } from "react-hook-form";
-import { FormControl, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Control, FieldValues, Path } from "react-hook-form";
+import { FormField as ShadFormField, FormControl, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -25,7 +25,7 @@ const FormField = <T extends FieldValues>({
   const isPassword = type === "password";
 
   return (
-    <Controller
+    <ShadFormField
       name={name}
       control={control}
       render={({ field }) => (
@@ -52,7 +52,7 @@ const FormField = <T extends FieldValues>({
           <FormMessage />
         </FormItem>
       )}
-    ></Controller>
+    ></ShadFormField>
   );
 };
 

@@ -62,7 +62,7 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if (!user.isOnboarded || !!user.otpCode || user.role !== "HELP_SEEKER") {
+    if (!!user.otpCode || user.role !== "HELP_SEEKER") {
       res
         .status(403)
         .json({ success: false, message: "Please verify your account first" });
@@ -113,7 +113,8 @@ export const verifyEmail = async (
         otpExpiry: null,
       },
     });
-
+    
+    res.redirect('http://localhost:3000/onboarding/details');
     res
       .status(200)
       .json({
