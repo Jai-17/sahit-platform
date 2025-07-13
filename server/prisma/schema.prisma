@@ -24,10 +24,11 @@ model User {
   ngo        NGO?
   helpSeeker HelpSeeker?
 
-  isOnboarded Boolean   @default(false)
-  isVerified  Boolean   @default(false)
-  otpCode     String?
-  otpExpiry   DateTime?
+  isOnboarded     Boolean   @default(false)
+  isVerified      Boolean   @default(false)
+  isAdminApproved Boolean   @default(false)
+  otpCode         String?
+  otpExpiry       DateTime?
 }
 
 model NGO {

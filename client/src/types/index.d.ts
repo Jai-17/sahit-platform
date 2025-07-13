@@ -35,7 +35,10 @@ interface TokenPayload {
     userId: string;
     isOnboarded: boolean;
     isVerified: boolean;
+    isAdminApproved: boolean;
     role: string;
+    userName?: string;
+    email?: string;
 }
 
 interface AuthState {

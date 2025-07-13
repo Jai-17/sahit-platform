@@ -12,7 +12,7 @@ router.post('/resend-otp', resendOtp)
 // router.patch('/reset-password')
 router.post('/oauth-sync', oauthSync)
 // router.get('/logout')
-router.post('/help-seeker-register', verifyJWT, registerHelpSeeker);
 router.post('/refresh-token', refreshAccessToken);
+router.post('/help-seeker-register', verifyJWT, registerHelpSeeker);
 
 export default router;

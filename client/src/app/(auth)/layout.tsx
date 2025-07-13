@@ -1,19 +1,16 @@
 "use client";
 
 import { useAuth } from "@/lib/hooks/useAuth";
-import { RootState } from "@/store/store";
+import { redirect } from "next/navigation";
 import Image from "next/image";
-import React, { ReactNode, useEffect } from "react";
-import { useSelector } from "react-redux";
+import React, { ReactNode } from "react";
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
   const user = useAuth();
-  const auth = useSelector((state: RootState) => state.auth);
-  useEffect(() => {
-    console.log("✅ Auth on reload:", auth);
-  }, [auth]);
 
-  console.log(user);
+  if(user.accessToken && user.isVerified && user.role == 'HELP_SEEKER' && user.isOnboarded && user.isAdminApproved) {
+    redirect('/');
+  }
 
   return (
     <div className="flex h-screen">

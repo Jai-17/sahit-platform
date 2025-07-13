@@ -10,6 +10,7 @@ export const useAuth = () => {
         userId: user?.userId,
         isOnboarded: user?.isOnboarded,
         isVerified: user?.isVerified,
+        isAdminApproved: user?.isAdminApproved,
         role: user?.role,
     }
 }

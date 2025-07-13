@@ -16,6 +16,7 @@ import { setAccessToken, setUser } from "@/store/features/authSlice";
 import { jwtDecode } from 'jwt-decode';
 import GoogleLoginButton from "../ui/googleLogin";
 import { store } from "@/store/store";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -43,6 +44,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
   type AuthFormData = z.infer<ReturnType<typeof authFormSchema>>;
   const [signIn] = useSignInMutation();
   const dispatch = useDispatch();
+  const user = useAuth();
 
   const form = useForm<AuthFormData>({
     resolver: zodResolver(formSchema),
@@ -78,6 +80,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
         dispatch(setUser(decode));
         console.log('Auth from Redux:', store.getState().auth);
         toast.success('Signed in Successfully');
+        if(user.isOnboarded) {return router.push('/onboarding/verify')};
         router.push('/onboarding/details');
       }
 

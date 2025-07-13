@@ -19,6 +19,7 @@ export const baseQueryWithReauth = async (
     credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.accessToken;
+      console.log('COMING FROM BASE QUERY AUTH YAY', token);
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
@@ -27,8 +28,8 @@ export const baseQueryWithReauth = async (
   });
 
   let result = await baseQuery(args, api, extraOptions);
-
-  if (result.error?.status === 401) {
+  console.log('COMING FROM BASE QUERY WITH AUTH', result);
+  if (result.error?.status === 403) {
     const refreshResult = await baseQuery(
       { url: '/api/v1/help/auth/refresh-token', method: 'POST' },
       api,

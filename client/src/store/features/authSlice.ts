@@ -17,6 +17,18 @@ export const authSlice = createSlice({
             state.user = action.payload;
         },
 
+        setIsOnboarded: (state, action: PayloadAction<boolean>) => {
+            if (state.user) {
+                state.user.isOnboarded = action.payload;
+            }
+        },
+
+        setIsAdminApproved: (state, action: PayloadAction<boolean>) => {
+          if(state.user) {
+            state.user.isAdminApproved = action.payload;
+          }  
+        },
+
         clearAuth: (state) => {
             state.accessToken = null;
             state.user = null;
@@ -24,5 +36,5 @@ export const authSlice = createSlice({
     }
 })
 
-export const { setAccessToken, setUser, clearAuth } = authSlice.actions;
+export const { setAccessToken, setUser, clearAuth, setIsOnboarded, setIsAdminApproved } = authSlice.actions;
 export default authSlice.reducer;

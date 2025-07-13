@@ -24,7 +24,8 @@ const VerifyPage = () => {
           width={300}
           height={500}
           alt="Verification Vector"
-          className="mt-10"
+          className="mt-10 w-[300px] h-[500px]"
+          priority={true}
         />
         <div className="flex w-full justify-between mt-6 md:mt-2">
           <Button

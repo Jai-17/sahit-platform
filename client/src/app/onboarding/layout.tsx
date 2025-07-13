@@ -3,12 +3,21 @@
 import OnboardingProgress from "@/components/common/OnboardingProgress";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { OnboardingFormProvider } from "@/store/OnboardingFormContext";
+import { redirect } from "next/navigation";
 import Image from "next/image";
 import React, { ReactNode } from "react";
 
 const OnboardingLayout = ({ children }: { children: ReactNode }) => {
   const user = useAuth();
   console.log(user);
+ 
+  if(user.accessToken && user.isVerified && user.isOnboarded && user.isAdminApproved) {
+    redirect('/');
+  }
+
+  if(!user.accessToken && !user.isVerified) {
+    redirect('/sign-in');
+  }
 
   return (
     <div className="flex h-screen bg-[#F7F8FA]">

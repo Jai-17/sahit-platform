@@ -23,8 +23,9 @@ export function verifyJWT(req: Request, res: Response, next: NextFunction) {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.AUTH_SECRET as string);
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as string);
     req.user = decoded;
+    console.log(req.user);
     next();
   } catch (err) {
     console.error("Invalid token:", err);

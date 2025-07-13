@@ -61,8 +61,13 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if(!user.password) {
-      res.status(400).json({success: false, message: "Please sign in with Google or register first"});
+    if (!user.password) {
+      res
+        .status(400)
+        .json({
+          success: false,
+          message: "Please sign in with Google or register first",
+        });
       return;
     }
 
@@ -84,12 +89,18 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
       isOnboarded: user.isOnboarded,
       isVerified: user.isVerified,
       role: user.role,
+      isAdminApproved: user.isAdminApproved,
+      userName: user.name,
+      email: user.email,
     });
     const refreshToken = generateRefreshToken({
       userId: user.id,
       isOnboarded: user.isOnboarded,
       isVerified: user.isVerified,
       role: user.role,
+      isAdminApproved: user.isAdminApproved,
+      userName: user.name,
+      email: user.email
     });
 
     res.cookie("refreshToken", refreshToken, {
@@ -100,14 +111,12 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
       secure: process.env.NODE_ENV === "production",
     });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Login successful",
-        data: user,
-        accessToken: accessToken,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: user,
+      accessToken: accessToken,
+    });
   } catch (error) {
     console.error("Error during sign in:", error);
     res
@@ -243,12 +252,18 @@ export const oauthSync = async (req: Request, res: Response): Promise<void> => {
       isOnboarded: user.isOnboarded,
       isVerified: user.isVerified,
       role: user.role,
+      isAdminApproved: user.isAdminApproved,
+      userName: user.name,
+      email: user.email,
     });
     const refreshToken = generateRefreshToken({
       userId: user.id,
       isOnboarded: user.isOnboarded,
       isVerified: user.isVerified,
       role: user.role,
+      isAdminApproved: user.isAdminApproved,
+      userName: user.name,
+      email: user.email,
     });
 
     res.cookie("refreshToken", refreshToken, {
@@ -259,14 +274,12 @@ export const oauthSync = async (req: Request, res: Response): Promise<void> => {
       secure: process.env.NODE_ENV === "production",
     });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "User synced successfully",
-        data: user,
-        accessToken: accessToken,
-      });
+    res.status(200).json({
+      success: true,
+      message: "User synced successfully",
+      data: user,
+      accessToken: accessToken,
+    });
   } catch (error) {
     console.error("Error during OAuth sync:", error);
     res
@@ -287,17 +300,20 @@ export const refreshAccessToken = async (
       .json({ success: false, message: "No refresh token provided" });
     return;
   }
-
+  console.log(token);
+  console.log('GOING INSIDE JWT');
   jwt.verify(
     token,
     process.env.REFRESH_TOKEN_SECRET as string,
     async (err: any, payload: any) => {
       if (err) return res.sendStatus(403);
-
+      console.log('COMING FROM REFRESH TOKEN', payload);
       const accessToken = generateAccessToken(payload.userId);
+      console.log('COMING FROM REFRESH TOKEN', accessToken);
       res.json({ accessToken });
     }
   );
+  console.log('GOING OUTSIDE JWT');
 };
 
 export const registerHelpSeeker = async (
@@ -320,19 +336,20 @@ export const registerHelpSeeker = async (
     idProofs,
   } = req.body;
   const emailFromToken = req.user?.email;
-  const userIdFromToken = req.user?.id;
-  const userNameFromToken = req.user?.name;
+  const userIdFromToken = req.user?.userId;
+  const userNameFromToken = req.user?.userName;
   const userRoleFromToken = req.user?.role;
-  const userOtpCodeFromToken = req.user?.otpCode;
+  const isVerifiedFromToken = req.user?.isVerified;
 
   try {
-    if (!!userOtpCodeFromToken || userRoleFromToken !== "HELP_SEEKER") {
+    if (!isVerifiedFromToken || userRoleFromToken !== "HELP_SEEKER") {
       res
         .status(403)
         .json({ success: false, message: "Please verify your account first" });
       return;
     }
 
+    console.log(emailFromToken, userIdFromToken, userNameFromToken)
     if (!emailFromToken || !userIdFromToken || !userNameFromToken) {
       res.status(400).json({ success: false, message: "Invalid user data" });
       return;
@@ -349,7 +366,8 @@ export const registerHelpSeeker = async (
       });
       return;
     }
-
+    
+    console.log(alias, 'COMING FROM AUTH CONTROLLER');
     const helpSeeker = await prisma.helpSeeker.create({
       data: {
         userId: userIdFromToken,
@@ -369,6 +387,11 @@ export const registerHelpSeeker = async (
         alias,
         idProofs,
       },
+    });
+
+    const user = await prisma.user.update({
+      where: { email: emailFromToken },
+      data: { isOnboarded: true },
     });
 
     res.status(201).json({

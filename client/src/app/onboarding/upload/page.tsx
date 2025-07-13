@@ -15,6 +15,8 @@ import { ArrowLeft, ArrowRight, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useHelpSeekerRegisterMutation } from "@/store/features/protectedApiSlice";
+import { useDispatch } from "react-redux";
+import { setIsOnboarded } from "@/store/features/authSlice";
 
 const uploadSchema = onboardingSchema.pick({
   alias: true,
@@ -28,6 +30,7 @@ const UploadPage = () => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [idProofPreviews, setIdProofPreviews] = useState<string | null>(null);
   const [helpSeekerRegister, {isLoading}] = useHelpSeekerRegisterMutation();
+  const dispatch = useDispatch();
 
   const form = useForm<z.infer<typeof uploadSchema>>({
     resolver: zodResolver(uploadSchema),
@@ -71,12 +74,15 @@ const UploadPage = () => {
   }
 
   async function onSubmit(values: z.infer<typeof uploadSchema>) {
-    setData({ ...data, ...values });
+    const updatedData = {...data, ...values};
+    setData(updatedData);
     console.log({ ...data, ...values });
 
     try {
-      helpSeekerRegister(data).unwrap();
+      console.log(data, 'COMING FROM PAGETSX UPLOAD SUBMIT BUTTON');
+      helpSeekerRegister(updatedData).unwrap();
       toast.success('Sent information successfully');
+      dispatch(setIsOnboarded(true));
       router.push('/onboarding/verify');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error:any) {
