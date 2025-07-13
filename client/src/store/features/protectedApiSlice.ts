@@ -1,20 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { baseQueryWithReauth } from "../baseQueryWithAuth";
 
 export const protectedApiSlice = createApi({
   reducerPath: "protectedApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_BACKEND_URL,
-    credentials: "include",
-    prepareHeaders: async (headers, { getState }) => {
-      const token = (getState() as any).auth.accessToken;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-
-      return headers;
-    },
-  }),
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
 
     helpSeekerRegister: builder.mutation({

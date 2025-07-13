@@ -1,17 +1,14 @@
+"use client";
+
 import OnboardingProgress from "@/components/common/OnboardingProgress";
-import { auth } from "@/config/auth";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { OnboardingFormProvider } from "@/store/OnboardingFormContext";
-import { redirect } from "next/navigation";
 import Image from "next/image";
 import React, { ReactNode } from "react";
 
-const OnboardingLayout = async ({ children }: { children: ReactNode }) => {
-  const session = await auth();
-  
-  if(!session) {
-    console.log(session);
-    redirect('/sign-in');
-  }
+const OnboardingLayout = ({ children }: { children: ReactNode }) => {
+  const user = useAuth();
+  console.log(user);
 
   return (
     <div className="flex h-screen bg-[#F7F8FA]">

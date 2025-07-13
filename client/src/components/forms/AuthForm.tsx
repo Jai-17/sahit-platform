@@ -15,6 +15,7 @@ import { useDispatch } from "react-redux";
 import { setAccessToken, setUser } from "@/store/features/authSlice";
 import { jwtDecode } from 'jwt-decode';
 import GoogleLoginButton from "../ui/googleLogin";
+import { store } from "@/store/store";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -75,6 +76,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
         dispatch(setAccessToken(res.accessToken));
         const decode = jwtDecode<TokenPayload>(res.accessToken);
         dispatch(setUser(decode));
+        console.log('Auth from Redux:', store.getState().auth);
         toast.success('Signed in Successfully');
         router.push('/onboarding/details');
       }

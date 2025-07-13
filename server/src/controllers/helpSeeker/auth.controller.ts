@@ -61,6 +61,11 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    if(!user.password) {
+      res.status(400).json({success: false, message: "Please sign in with Google or register first"});
+      return;
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password!);
     if (!isPasswordValid) {
       res.status(401).json({ success: false, message: "Incorrect password" });

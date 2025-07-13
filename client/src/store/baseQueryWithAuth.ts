@@ -3,12 +3,12 @@
 import { BaseQueryApi, FetchArgs, fetchBaseQuery } from '@reduxjs/toolkit/query';
 import { clearAuth, setAccessToken } from './features/authSlice';
 import { RootState } from './store';
+import { redirect } from 'next/navigation';
 
 interface RefreshResponse {
   accessToken: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const baseQueryWithReauth = async (
   args: string | FetchArgs,
   api: BaseQueryApi,
@@ -43,6 +43,7 @@ export const baseQueryWithReauth = async (
       result = await baseQuery(args, api, extraOptions);
     } else {
       api.dispatch(clearAuth());
+      redirect('/sign-in');
     }
   }
 

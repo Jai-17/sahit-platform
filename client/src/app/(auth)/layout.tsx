@@ -1,7 +1,20 @@
+"use client";
+
+import { useAuth } from "@/lib/hooks/useAuth";
+import { RootState } from "@/store/store";
 import Image from "next/image";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
+  const user = useAuth();
+  const auth = useSelector((state: RootState) => state.auth);
+  useEffect(() => {
+    console.log("✅ Auth on reload:", auth);
+  }, [auth]);
+
+  console.log(user);
+
   return (
     <div className="flex h-screen">
       <div className="relative flex-1/2 hidden lg:block">
@@ -16,7 +29,7 @@ const AuthLayout = ({ children }: { children: ReactNode }) => {
             alt="logo"
             className="invert pt-8 ml-8 w-auto h-auto"
           />
-          <div className="flex flex-col items-center h-screen justify-center -mt-24 gap-2">
+          <div className="flex flex-col h-screen justify-center -mt-24 gap-2 items-center">
             <h1 className="text-2xl">Welcome To</h1>
             <p className="text-4xl font-semibold">SAHIT Support Portal</p>
             <p className="text-xl italic">
