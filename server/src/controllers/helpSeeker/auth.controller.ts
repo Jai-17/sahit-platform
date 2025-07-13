@@ -11,6 +11,22 @@ config();
 import { OAuth2Client } from "google-auth-library";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+export const getUser = async (req: Request, res: Response): Promise<void> => {
+  const userId = req.user.userId;
+
+  try {
+    const result = await prisma.user.findUnique({where: {id: userId}});
+    if(!result) {
+      res.status(404).json({success: false, message: "User not found"});
+    }
+    console.log(result);
+    res.status(200).json({success: true, message: "User found", data: result});
+  } catch (error) {
+    console.log('Error', error);
+    res.status(500).json({success: false, message: "Internal server error", error: error});
+  }
+}
+
 export const signUp = async (req: Request, res: Response): Promise<void> => {
   const { name, email, password } = req.body;
 

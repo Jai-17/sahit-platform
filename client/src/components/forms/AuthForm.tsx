@@ -10,10 +10,13 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useSignInMutation, useSignUpMutation } from "@/store/features/apiSlice";
+import {
+  useSignInMutation,
+  useSignUpMutation,
+} from "@/store/features/apiSlice";
 import { useDispatch } from "react-redux";
 import { setAccessToken, setUser } from "@/store/features/authSlice";
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 import GoogleLoginButton from "../ui/googleLogin";
 import { store } from "@/store/store";
 import { useAuth } from "@/lib/hooks/useAuth";
@@ -39,7 +42,7 @@ const authFormSchema = (type: FormType) => {
 const AuthForm = ({ type }: { type: FormType }) => {
   const router = useRouter();
   const isSignIn = type === "sign-in";
-  const [signUp, {isLoading}] = useSignUpMutation();
+  const [signUp, { isLoading }] = useSignUpMutation();
   const formSchema = authFormSchema(type);
   type AuthFormData = z.infer<ReturnType<typeof authFormSchema>>;
   const [signIn] = useSignInMutation();
@@ -58,34 +61,34 @@ const AuthForm = ({ type }: { type: FormType }) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(type);
     try {
-
       // SIGN UP LOGIC
       if (type === "sign-up") {
         await signUp({
           name: values.name as string,
           email: values.email,
-          password: values.password
-        }).unwrap()
+          password: values.password,
+        }).unwrap();
 
-        toast.success('Signed up Successfully');
-        router.push('/sign-in');
-
-
+        toast.success("Signed up Successfully");
+        router.push("/sign-in");
       } else {
-
         // SIGN IN LOGIC
-        const res = await signIn({email: values.email, password: values.password}).unwrap();
+        const res = await signIn({
+          email: values.email,
+          password: values.password,
+        }).unwrap();
         dispatch(setAccessToken(res.accessToken));
         const decode = jwtDecode<TokenPayload>(res.accessToken);
         dispatch(setUser(decode));
-        console.log('Auth from Redux:', store.getState().auth);
-        toast.success('Signed in Successfully');
-        if(user.isOnboarded) {return router.push('/onboarding/verify')};
-        router.push('/onboarding/details');
+        console.log("Auth from Redux:", store.getState().auth);
+        toast.success("Signed in Successfully");
+        if (user.isOnboarded) {
+          return router.push("/onboarding/verify");
+        }
+        router.push("/onboarding/details");
       }
 
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
       toast.error(`There was an error: ${error.data.message}`);
@@ -134,7 +137,11 @@ const AuthForm = ({ type }: { type: FormType }) => {
             type="submit"
             className="w-full min-h-10 bg-[#8300EA] mt-2 hover:bg-[#8300EA95] transition duration-300 cursor-pointer ease-in"
           >
-            {isSignIn ? "Sign In" : (isLoading ? 'Submitting...' : 'Create an Account')}
+            {isSignIn
+              ? "Sign In"
+              : isLoading
+              ? "Submitting..."
+              : "Create an Account"}
           </Button>
         </form>
       </Form>
@@ -153,7 +160,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
         Sign in With Google
       </Button> */}
       <GoogleLoginButton />
-
 
       <p className="mt-2">
         {isSignIn ? "No account yet?" : "Have an account already"}

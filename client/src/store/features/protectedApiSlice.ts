@@ -13,7 +13,11 @@ export const protectedApiSlice = createApi({
         body: userData,
       }),
     }),
+
+    getUser: builder.query({
+      query: () => 'api/v1/help/auth/getuser',
+    })
   }),
 });
 
-export const { useHelpSeekerRegisterMutation } = protectedApiSlice;
+export const { useHelpSeekerRegisterMutation, useGetUserQuery } = protectedApiSlice;
