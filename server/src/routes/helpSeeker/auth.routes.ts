@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { oauthSync, resendOtp, signIn, signUp, verifyEmail } from "../../controllers/helpSeeker/auth.controller";
+import { oauthSync, refreshAccessToken, registerHelpSeeker, resendOtp, signIn, signUp, verifyEmail } from "../../controllers/helpSeeker/auth.controller";
+import { verifyJWT } from "../../middleware/auth";
 
 const router = Router();
 
@@ -11,5 +12,7 @@ router.post('/resend-otp', resendOtp)
 // router.patch('/reset-password')
 router.post('/oauth-sync', oauthSync)
 // router.get('/logout')
+router.post('/help-seeker-register', verifyJWT, registerHelpSeeker);
+router.post('/refresh-token', refreshAccessToken);
 
 export default router;

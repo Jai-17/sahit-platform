@@ -65,7 +65,11 @@ const Sidebar = () => {
             className="mb-12"
           />
           {navItems.map((item) => {
-            const isActive = pathname === item.path;
+            const isActive =
+              item.path === "/"
+                ? pathname === "/"
+                : pathname === item.path ||
+                  pathname.startsWith(item.path + "/");
 
             return (
               <Link

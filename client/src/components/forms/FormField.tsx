@@ -12,14 +12,16 @@ interface FormFieldProps<T extends FieldValues> {
   label: string;
   placeholder?: string;
   type?: "text" | "email" | "password" | "file";
+  fieldDisabled?: boolean
 }
 
-const FormField = <T extends FieldValues>({
+const CustomFormField = <T extends FieldValues>({
   control,
   name,
   label,
   placeholder,
   type = "text",
+  fieldDisabled
 }: FormFieldProps<T>) => {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === "password";
@@ -34,9 +36,10 @@ const FormField = <T extends FieldValues>({
           <FormControl>
             <div className="relative">
               <Input
-                className="min-h-14 w-full pr-10 md:w-[450px] rounded-lg px-4 transition-all duration-300 ease-in"
+                className="min-h-14 w-full pr-10 md:w-full rounded-lg px-4 transition-all duration-300 ease-in text-xs md:text-base"
                 type={isPassword ? (showPassword ? "text" : "password") : type}
                 placeholder={placeholder}
+                disabled={fieldDisabled}
                 {...field}
               />
               {isPassword && (
@@ -56,4 +59,4 @@ const FormField = <T extends FieldValues>({
   );
 };
 
-export default FormField;
+export default CustomFormField;

@@ -1,15 +1,16 @@
-'use client'
+"use client";
 
-import React, { ReactNode } from 'react'
-import {Provider} from 'react-redux';
-import { store } from './store';
+import React, { ReactNode } from "react";
+import { Provider } from "react-redux";
+import { store } from "./store";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
-const StoreProvider = ({children}: {children:ReactNode}) => {
+const StoreProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <Provider store={store()}>
-        {children}
-    </Provider>
-  )
-}
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_AUTH_GOOGLE_ID!}>
+      <Provider store={store()}>{children}</Provider>
+    </GoogleOAuthProvider>
+  );
+};
 
-export default StoreProvider
+export default StoreProvider;

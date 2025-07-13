@@ -8,11 +8,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "./FormField";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import Image from "next/image";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useSignUpMutation } from "@/store/features/apiSlice";
+import { useSignInMutation, useSignUpMutation } from "@/store/features/apiSlice";
+import { useDispatch } from "react-redux";
+import { setAccessToken, setUser } from "@/store/features/authSlice";
+import { jwtDecode } from 'jwt-decode';
+import GoogleLoginButton from "../ui/googleLogin";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -38,6 +40,8 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const [signUp, {isLoading}] = useSignUpMutation();
   const formSchema = authFormSchema(type);
   type AuthFormData = z.infer<ReturnType<typeof authFormSchema>>;
+  const [signIn] = useSignInMutation();
+  const dispatch = useDispatch();
 
   const form = useForm<AuthFormData>({
     resolver: zodResolver(formSchema),
@@ -51,6 +55,8 @@ const AuthForm = ({ type }: { type: FormType }) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(type);
     try {
+
+      // SIGN UP LOGIC
       if (type === "sign-up") {
         await signUp({
           name: values.name as string,
@@ -60,32 +66,25 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
         toast.success('Signed up Successfully');
         router.push('/sign-in');
-      } else {
-        const res = await signIn("credentials", {
-          email: values.email,
-          password: values.password,
-          redirect: false,
-        });
 
-        if (res && res.ok) {
-          toast.success('Signed in successfully!');
-          router.push("/");
-        } else {
-          toast.error(`Sign in Failed: ${res.error}`);
-        }
+
+      } else {
+
+        // SIGN IN LOGIC
+        const res = await signIn({email: values.email, password: values.password}).unwrap();
+        dispatch(setAccessToken(res.accessToken));
+        const decode = jwtDecode<TokenPayload>(res.accessToken);
+        dispatch(setUser(decode));
+        toast.success('Signed in Successfully');
+        router.push('/onboarding/details');
       }
+
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
       toast.error(`There was an error: ${error.data.message}`);
     }
-  }
-
-  async function googleLogin() {
-    signIn("google", {
-      callbackUrl: "/",
-      redirect: true,
-    });
   }
 
   return (
@@ -140,14 +139,16 @@ const AuthForm = ({ type }: { type: FormType }) => {
         <p>OR</p>
         <div className="border w-40 my-4 rounded-full"></div>
       </div>
-      <Button
+      {/* <Button
         variant="outline"
         className="min-h-10 border rounded-2xl bg-transparent cursor-pointer"
         onClick={googleLogin}
       >
         <Image src="/google.webp" width={24} height={24} alt="google logo" />
         Sign in With Google
-      </Button>
+      </Button> */}
+      <GoogleLoginButton />
+
 
       <p className="mt-2">
         {isSignIn ? "No account yet?" : "Have an account already"}

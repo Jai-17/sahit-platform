@@ -4,7 +4,7 @@ import React from "react";
 const SentRequestTableCard = () => {
   return (
     <div>
-      <div className="mt-7 lg:mt-0 flex justify-between items-start shadow-lg/5 hover:shadow-lg/5 transition duration-300 border border-neutral-200 py-6 px-5 lg:px-7 rounded-lg">
+      <div className="bg-white mt-7 lg:mt-0 flex justify-between items-start shadow-lg/5 hover:shadow-lg/5 transition duration-300 border border-neutral-200 py-6 px-5 lg:px-7 rounded-lg">
         <div className="grid grid-cols-1 gap-y-4 lg:grid-cols-6 lg:gap-y-0 text-neutral-600 w-full">
           <p>
             <span className="lg:hidden font-semibold text-sm text-black">

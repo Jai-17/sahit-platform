@@ -3,6 +3,13 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { addMinutes } from "date-fns";
 import { sendVerificationEmail } from "../../utils/email.config";
+import { generateAccessToken, generateRefreshToken } from "../../utils/token";
+import jwt from "jsonwebtoken";
+import { config } from "dotenv";
+config();
+
+import { OAuth2Client } from "google-auth-library";
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const signUp = async (req: Request, res: Response): Promise<void> => {
   const { name, email, password } = req.body;
@@ -30,13 +37,11 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
     });
 
     sendVerificationEmail(name, email, otp).catch(console.error);
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "User created successfully",
-        data: newUser,
-      });
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      data: newUser,
+    });
   } catch (error) {
     console.error("Error during sign up:", error);
     res
@@ -62,16 +67,42 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if (!!user.otpCode || user.role !== "HELP_SEEKER") {
+    if (!user.isVerified || user.role !== "HELP_SEEKER") {
       res
         .status(403)
         .json({ success: false, message: "Please verify your account first" });
       return;
     }
 
+    const accessToken = generateAccessToken({
+      userId: user.id,
+      isOnboarded: user.isOnboarded,
+      isVerified: user.isVerified,
+      role: user.role,
+    });
+    const refreshToken = generateRefreshToken({
+      userId: user.id,
+      isOnboarded: user.isOnboarded,
+      isVerified: user.isVerified,
+      role: user.role,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      path: "/api/auth/refresh-token",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production",
+    });
+
     res
       .status(200)
-      .json({ success: true, message: "Login successful", data: user });
+      .json({
+        success: true,
+        message: "Login successful",
+        data: user,
+        accessToken: accessToken,
+      });
   } catch (error) {
     console.error("Error during sign in:", error);
     res
@@ -111,17 +142,11 @@ export const verifyEmail = async (
       data: {
         otpCode: null,
         otpExpiry: null,
+        isVerified: true,
       },
     });
-    
-    res.redirect('http://localhost:3000/onboarding/details');
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Email verified successfully",
-        data: updatedUser,
-      });
+
+    res.redirect("http://localhost:3000/sign-in");
   } catch (error) {
     console.error("Error during email verification:", error);
     res
@@ -157,13 +182,11 @@ export const resendOtp = async (req: Request, res: Response): Promise<void> => {
       updatedUser.email,
       verificationCode
     ).catch(console.error);
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "OTP resent successfully",
-        data: updatedUser,
-      });
+    res.status(200).json({
+      success: true,
+      message: "OTP resent successfully",
+      data: updatedUser,
+    });
   } catch (error) {
     console.error("Error during OTP resend:", error);
     res
@@ -173,32 +196,185 @@ export const resendOtp = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const oauthSync = async (req: Request, res: Response): Promise<void> => {
-    const {email, name} = req.body;
+  const { token } = req.body;
+  if (!token) {
+    res.status(400).json({ success: false, message: "No token provided" });
+    return;
+  }
 
-    try {
-        let user = await prisma.user.findUnique({where: {email}});
-        if(!user) {
-            user = await prisma.user.create({
-                data: {
-                    email,
-                    name,
-                    isOnboarded: false,
-                    role: 'HELP_SEEKER',
-                    otpCode: null,
-                    otpExpiry: null,
-                }
-            });
-        }
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
 
-        res.status(200).json({success: true, message: "User synced successfully", data: user});
-    } catch (error) {
-        console.error("Error during OAuth sync:", error);
-        res
-          .status(500)
-          .json({ success: false, message: "Internal server error", error: error });
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email || !payload.name) {
+      res
+        .status(400)
+        .json({ success: false, message: "Invalid token payload" });
+      return;
     }
-}
 
-export const registerHelpSeeker = async (req: Request, res: Response): Promise<void> => {
-  
-}
+    const { email, name } = payload;
+
+    let user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email,
+          name,
+          isOnboarded: false,
+          role: "HELP_SEEKER",
+          otpCode: null,
+          otpExpiry: null,
+          isVerified: true,
+        },
+      });
+    }
+
+    const accessToken = generateAccessToken({
+      userId: user.id,
+      isOnboarded: user.isOnboarded,
+      isVerified: user.isVerified,
+      role: user.role,
+    });
+    const refreshToken = generateRefreshToken({
+      userId: user.id,
+      isOnboarded: user.isOnboarded,
+      isVerified: user.isVerified,
+      role: user.role,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      path: "/api/auth/refresh-token",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "User synced successfully",
+        data: user,
+        accessToken: accessToken,
+      });
+  } catch (error) {
+    console.error("Error during OAuth sync:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error", error: error });
+  }
+};
+
+export const refreshAccessToken = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const token = req.cookies.refreshToken;
+
+  if (!token) {
+    res
+      .status(401)
+      .json({ success: false, message: "No refresh token provided" });
+    return;
+  }
+
+  jwt.verify(
+    token,
+    process.env.REFRESH_TOKEN_SECRET as string,
+    async (err: any, payload: any) => {
+      if (err) return res.sendStatus(403);
+
+      const accessToken = generateAccessToken(payload.userId);
+      res.json({ accessToken });
+    }
+  );
+};
+
+export const registerHelpSeeker = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const {
+    age,
+    occupation,
+    company,
+    jobType,
+    contact,
+    whatsappSame,
+    whatsapp,
+    address,
+    city,
+    state,
+    alias,
+    photo,
+    idProofs,
+  } = req.body;
+  const emailFromToken = req.user?.email;
+  const userIdFromToken = req.user?.id;
+  const userNameFromToken = req.user?.name;
+  const userRoleFromToken = req.user?.role;
+  const userOtpCodeFromToken = req.user?.otpCode;
+
+  try {
+    if (!!userOtpCodeFromToken || userRoleFromToken !== "HELP_SEEKER") {
+      res
+        .status(403)
+        .json({ success: false, message: "Please verify your account first" });
+      return;
+    }
+
+    if (!emailFromToken || !userIdFromToken || !userNameFromToken) {
+      res.status(400).json({ success: false, message: "Invalid user data" });
+      return;
+    }
+
+    const existingHelpSeeker = await prisma.helpSeeker.findUnique({
+      where: { userId: userIdFromToken },
+    });
+
+    if (existingHelpSeeker) {
+      res.status(400).json({
+        success: false,
+        message: "Help seeker already registered",
+      });
+      return;
+    }
+
+    const helpSeeker = await prisma.helpSeeker.create({
+      data: {
+        userId: userIdFromToken,
+        name: userNameFromToken,
+        age,
+        address,
+        city,
+        state,
+        contact,
+        email: emailFromToken,
+        company,
+        jobType,
+        photo,
+        occupation,
+        whatsappSame,
+        whatsapp,
+        alias,
+        idProofs,
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Help seeker registered successfully",
+      data: helpSeeker,
+    });
+  } catch (error) {
+    console.error("Error during help seeker registration:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error", error: error });
+  }
+};

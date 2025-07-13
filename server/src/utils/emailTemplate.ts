@@ -46,7 +46,7 @@ export function getVerificationEmail(name: string, email: string, code: string):
           <h1>Verify Your Email</h1>
           <p>Hi ${name},</p>
           <p>Thanks for signing up! Please verify your email address by clicking the button below:</p>
-          <a href="${process.env.BASE_URL}/api/v1/auth/verify-otp?code=${code}&email=${email}" class="btn">Verify Email</a>
+          <a href="${process.env.BASE_URL}/api/v1/help/auth/verify-otp?code=${code}&email=${email}" class="btn">Verify Email</a>
           <p class="footer">If you didn't create an account, you can ignore this message.</p>
         </div>
       </body>

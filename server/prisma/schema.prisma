@@ -25,6 +25,7 @@ model User {
   helpSeeker HelpSeeker?
 
   isOnboarded Boolean   @default(false)
+  isVerified  Boolean   @default(false)
   otpCode     String?
   otpExpiry   DateTime?
 }
@@ -49,7 +50,6 @@ model NGO {
   representativeAvailability String
 
   verifiedDocs String[]
-  isVerified   Boolean  @default(false)
 
   helpRequests HelpRequest[]
 
@@ -58,21 +58,22 @@ model NGO {
 }
 
 model HelpSeeker {
-  id           String   @id @default(uuid())
+  id           String  @id @default(uuid())
   name         String
   age          Int
-  location     String
+  address      String
+  city         String
+  state        String
   contact      String
   email        String?
   company      String?
   jobType      String?
   photo        String?
   occupation   String?
-  whatsappSame Boolean  @default(true)
+  whatsappSame Boolean @default(true)
   whatsapp     String?
-  isVerified   Boolean  @default(false)
   alias        String
-  idProofs     String[]
+  idProofs     String
 
   helpRequests HelpRequest[]
   feedbacks    Feedback[]

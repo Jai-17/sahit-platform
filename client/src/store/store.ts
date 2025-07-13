@@ -1,14 +1,18 @@
 import { configureStore } from '@reduxjs/toolkit';
 import navigationReducer from './features/NavigationSlice';
 import { apiSlice } from './features/apiSlice';
+import { protectedApiSlice } from './features/protectedApiSlice';
+import authReducer from './features/authSlice';
 
 export const store = () => {
     return configureStore({
         reducer: {
             navigation: navigationReducer,
-            [apiSlice.reducerPath]: apiSlice.reducer,   
+            auth: authReducer,
+            [apiSlice.reducerPath]: apiSlice.reducer,
+            [protectedApiSlice.reducerPath]: protectedApiSlice.reducer,
         },
-        middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiSlice.middleware),
+        middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiSlice.middleware, protectedApiSlice.middleware),
     })
 }
 
