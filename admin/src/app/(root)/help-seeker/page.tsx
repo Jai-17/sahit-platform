@@ -1,0 +1,40 @@
+"use client"
+
+import { Input } from "@/components/ui/input";
+import WomenTable from "@/components/WomenTable";
+import { Search } from "lucide-react";
+import React, { useState } from "react";
+
+const HelpSeekerPage = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  return (
+    <div>
+      <div className="flex items-baseline justify-between">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-semibold mb-2">
+            Help Seekers
+          </h1>
+          <p className="text-neutral-500 text-sm lg:text-base">
+            All Support Seekers who have registed on the platform
+          </p>
+        </div>
+        <div className="relative w-fit">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            type="text"
+            placeholder="Search..."
+            className="pl-10 w-[350px] bg-white"
+            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchTerm}
+          />
+        </div>
+      </div>
+      <div>
+        <WomenTable searchTerm={searchTerm} />
+      </div>
+    </div>
+  );
+};
+
+export default HelpSeekerPage;

@@ -59,7 +59,7 @@ model NGO {
 }
 
 model HelpSeeker {
-  id           String  @id @default(uuid())
+  id           String   @id @default(uuid())
   name         String
   age          Int
   address      String
@@ -71,10 +71,11 @@ model HelpSeeker {
   jobType      String?
   photo        String?
   occupation   String?
-  whatsappSame Boolean @default(true)
+  whatsappSame Boolean  @default(true)
   whatsapp     String?
   alias        String
   idProofs     String
+  createdAt    DateTime @default(now())
 
   helpRequests HelpRequest[]
   feedbacks    Feedback[]

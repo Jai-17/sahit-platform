@@ -3,10 +3,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 /* ROUTE IMPORTS HELP SEEKER */
 import authRoutes from './routes/helpSeeker/auth.routes';
-import cookieParser from 'cookie-parser';
+import userRoutes from './routes/helpSeeker/user.routes';
+
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
 
 dotenv.config();
 const app = express();
@@ -15,7 +18,13 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({policy: "cross-origin"}));
 app.use(morgan("common"));
-app.use(cors({credentials: true, origin: process.env.PUBLIC_FRONTEND_URL}));
+app.use(cors({credentials: true, origin: (origin, callback) => {
+    if(!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+    } else {
+        callback(new Error('Now allowed by CORS'));
+    }
+}}));
 
 app.get("/", (req, res) => {
     res.json({message: "Server is running!"});
@@ -23,6 +32,7 @@ app.get("/", (req, res) => {
 
 // Help Seeker Routes
 app.use('/api/v1/help/auth', authRoutes);
+app.use('/api/v1/help/user', userRoutes);
 
 const port = Number(process.env.PORT) || 8000;
 app.listen(port, "0.0.0.0", () => {
