@@ -61,6 +61,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(type);
     try {
+
       // SIGN UP LOGIC
       if (type === "sign-up") {
         await signUp({
@@ -71,7 +72,9 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
         toast.success("Signed up Successfully");
         router.push("/sign-in");
+
       } else {
+
         // SIGN IN LOGIC
         const res = await signIn({
           email: values.email,
@@ -83,9 +86,13 @@ const AuthForm = ({ type }: { type: FormType }) => {
         console.log("Auth from Redux:", store.getState().auth);
         toast.success("Signed in Successfully");
         if (user.isOnboarded) {
-          return router.push("/onboarding/verify");
+          console.log('ISONBOARDED', user.isOnboarded);
+          router.push("/onboarding/verify");
+        } else {
+          console.log('ISONBOARDED', user.isOnboarded);
+          router.push("/onboarding/details");
         }
-        router.push("/onboarding/details");
+
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

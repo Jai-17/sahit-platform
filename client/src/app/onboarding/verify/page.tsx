@@ -1,34 +1,31 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/hooks/useAuth";
 import { setIsAdminApproved } from "@/store/features/authSlice";
 import { useGetUserQuery } from "@/store/features/protectedApiSlice";
-import { useOnboardingForm } from "@/store/OnboardingFormContext";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 
 const VerifyPage = () => {
-  const auth = useAuth();
-  const { data } = useOnboardingForm();
-  console.log(data);
   const router = useRouter();
   const dispatch = useDispatch();
-  const {data: user, isLoading} = useGetUserQuery(undefined);
-  console.log(user, 'COMING FROM PAGE VERIFY');
+  const { data: user, isLoading } = useGetUserQuery(undefined);
+  console.log(user, "COMING FROM PAGE VERIFY");
 
   useEffect(() => {
-    if(!isLoading && user?.data?.isAdminApproved) {
-    console.log('COMING FROM PAGE VERIFY ADMIN APPROVED', user?.data?.isAdminApproved);
-    dispatch(setIsAdminApproved(true));
-    console.log(auth)
-    router.push('/');
-  }
-  }, [isLoading, user, dispatch, auth, router]);
+    if (!isLoading && user?.data?.isAdminApproved) {
+      console.log(
+        "COMING FROM PAGE VERIFY ADMIN APPROVED",
+        user?.data?.isAdminApproved
+      );
+      dispatch(setIsAdminApproved(true));
+      redirect('/');
+    }
+  }, [isLoading, user, dispatch]);
 
   return (
     <div className="flex flex-col items-center">
@@ -52,7 +49,7 @@ const VerifyPage = () => {
             <ArrowLeft /> Previous
           </Button>
           <Button
-          disabled
+            disabled
             onClick={() => toast.success("Admin will verify you soon!")}
             className="w-40 min-h-10 bg-[#8300EA] hover:bg-[#8300EA95] transition duration-300 cursor-pointer ease-in"
           >
