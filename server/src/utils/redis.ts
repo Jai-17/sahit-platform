@@ -1,10 +1,10 @@
-import { Redis } from "@upstash/redis";
+import Redis from "ioredis";
 import { config } from "dotenv";
 config();
 
-const redis = new Redis({
-    url: 'https://creative-mongoose-57903.upstash.io',
-    token: process.env.REDIS_TOKEN
-})
+const redis = new Redis(process.env.REDIS_URL!, {
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false
+});
 
 export default redis;

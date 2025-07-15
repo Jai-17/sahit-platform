@@ -3,7 +3,7 @@ import redis from "../../utils/redis";
 import { prisma } from "../../db";
 
 export const getAllNgos = async (req: Request, res: Response):Promise<void> => {
-    const cacheKey = "AllNGOs";
+    const cacheKey = "cache:AllNGOs";
 
     try {
         const cached = await redis.get(cacheKey);
@@ -13,7 +13,7 @@ export const getAllNgos = async (req: Request, res: Response):Promise<void> => {
             res.json({
                 success: true,
                 message: "Found NGOs from REDIS",
-                data: cached
+                data: JSON.parse(cached),
             })
             return;
         }
@@ -30,7 +30,7 @@ export const getAllNgos = async (req: Request, res: Response):Promise<void> => {
             return;
         }
 
-        await redis.set(cacheKey, data, {ex:300});
+        await redis.set(cacheKey, JSON.stringify(data), 'EX', 300);
 
         res.status(200).json({success: true, message: 'Found NGOs from DB', data: data});
     } catch (error) {

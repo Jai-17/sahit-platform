@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../../db";
+import { queue } from "../../utils/worker";
 
 export const createRequest = async (
   req: Request,
@@ -41,9 +42,11 @@ export const createRequest = async (
       },
     });
 
-    if(similar) {
-        res.status(501).json({success: false, message: "Similar Request already exists"});
-        return;
+    if (similar) {
+      res
+        .status(501)
+        .json({ success: false, message: "Similar Request already exists" });
+      return;
     }
 
     const helpRequest = await prisma.helpRequest.create({
@@ -60,13 +63,21 @@ export const createRequest = async (
       },
     });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Help Request created successfully",
-        data: helpRequest,
-      });
+    // await pushHelpRequests(helpRequest.id);
+    await queue.add(
+      "help-request",
+      { helpRequestId: helpRequest.id },
+      {
+        removeOnComplete: {age: 3600, count: 1000},
+        removeOnFail: { age: 86400 },
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Help Request created successfully",
+      data: helpRequest,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Interal Server Error" });

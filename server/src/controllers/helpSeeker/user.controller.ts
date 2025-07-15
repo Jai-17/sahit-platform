@@ -6,7 +6,7 @@ export const getAllHelpSeekers = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const cacheKey = "HelpSeekers";
+  const cacheKey = "cache:HelpSeekers";
 
   try {
     const cached = await redis.get(cacheKey);
@@ -16,7 +16,7 @@ export const getAllHelpSeekers = async (
       res.json({
         success: true,
         message: "Found help seekers from REDIS",
-        data: cached,
+        data: JSON.parse(cached)
       });
       return;
     }
@@ -35,7 +35,7 @@ export const getAllHelpSeekers = async (
       return;
     }
 
-    await redis.set(cacheKey, data, { ex: 300 });
+    await redis.set(cacheKey, JSON.stringify(data), 'EX', 300);
 
     res
       .status(200)
