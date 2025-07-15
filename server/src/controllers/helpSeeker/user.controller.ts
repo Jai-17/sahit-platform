@@ -77,6 +77,7 @@ export const getHelpSeekerById = async (
   }
 };
 
+// OVERALL ADMIN APPROVE
 export const approveHelpSeeker = async (
   req: Request,
   res: Response
@@ -89,18 +90,21 @@ export const approveHelpSeeker = async (
       console.log(user);
     if (!user) {
       res.status(404).json({ success: false, message: "User not found" });
+      return;
     }
 
     if (!user?.isOnboarded) {
       res
         .status(402)
         .json({ success: false, message: "User is not onboarded yet" });
+        return;
     }
 
     if (user?.isAdminApproved) {
       res
         .status(401)
         .json({ success: false, message: "User is already verified" });
+        return;
     }
 
     const updatedUser = await prisma.user.update({

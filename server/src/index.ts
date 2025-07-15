@@ -9,6 +9,12 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/helpSeeker/auth.routes';
 import userRoutes from './routes/helpSeeker/user.routes';
 
+/* ROUTE IMPORTS HELP REQUEST */
+import createRoutes from './routes/helpRequest/request.routes';
+
+/* ROUTE IMPORTS NGOS */
+import userNGORoutes from './routes/ngo/user.routes';
+
 const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
 
 dotenv.config();
@@ -33,6 +39,12 @@ app.get("/", (req, res) => {
 // Help Seeker Routes
 app.use('/api/v1/help/auth', authRoutes);
 app.use('/api/v1/help/user', userRoutes);
+
+// Help Request Routes
+app.use('/api/v1/request', createRoutes);
+
+// NGO Request Routes
+app.use('/api/v1/ngo/user', userNGORoutes)
 
 const port = Number(process.env.PORT) || 8000;
 app.listen(port, "0.0.0.0", () => {

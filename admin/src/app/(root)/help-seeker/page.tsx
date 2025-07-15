@@ -10,7 +10,7 @@ const HelpSeekerPage = () => {
 
   return (
     <div>
-      <div className="flex items-baseline justify-between">
+      <div className="flex flex-col md:flex-row items-baseline justify-between">
         <div>
           <h1 className="text-2xl lg:text-3xl font-semibold mb-2">
             Help Seekers
@@ -19,7 +19,7 @@ const HelpSeekerPage = () => {
             All Support Seekers who have registed on the platform
           </p>
         </div>
-        <div className="relative w-fit">
+        <div className="relative w-fit mt-7 md:mt-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             type="text"
