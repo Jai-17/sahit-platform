@@ -22,9 +22,13 @@ export const apiSlice = createApi({
                 method: 'PATCH',
                 body: userData
             })
-        })
+        }),
 
+        // NGO ROUTES
+        getAllNGOs: builder.query({
+            query: () => 'api/v1/ngo/user/get-ngos'
+        })
     })
 })
 
-export const { useGetAllHelpSeekerQuery, useGetHelpSeekerByIdQuery, useHelpSeekerAdminApproveMutation } = apiSlice;
+export const { useGetAllHelpSeekerQuery, useGetHelpSeekerByIdQuery, useHelpSeekerAdminApproveMutation, useGetAllNGOsQuery } = apiSlice;
