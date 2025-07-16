@@ -1,5 +1,5 @@
-import { prisma } from "../../db";
 import { Request, Response } from "express";
+import { prisma } from "../../db";
 import bcrypt from "bcryptjs";
 import { addMinutes } from "date-fns";
 import { sendVerificationEmail } from "../../utils/email.config";
@@ -11,22 +11,28 @@ config();
 import { OAuth2Client } from "google-auth-library";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// GET NGO USER
 export const getUser = async (req: Request, res: Response): Promise<void> => {
   const userId = req.user.userId;
 
   try {
-    const result = await prisma.user.findUnique({where: {id: userId}});
-    if(!result) {
-      res.status(404).json({success: false, message: "User not found"});
+    const result = await prisma.user.findUnique({ where: { id: userId } });
+    if (!result) {
+      res.status(404).json({ success: false, message: "User not found" });
     }
     console.log(result);
-    res.status(200).json({success: true, message: "User found", data: result});
+    res
+      .status(200)
+      .json({ success: true, message: "User found", data: result });
   } catch (error) {
-    console.log('Error', error);
-    res.status(500).json({success: false, message: "Internal server error", error: error});
+    console.log("Error", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error", error: error });
   }
-}
+};
 
+// SIGN UP NGO
 export const signUp = async (req: Request, res: Response): Promise<void> => {
   const { name, email, password } = req.body;
 
@@ -48,7 +54,7 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
         password: hashedPassword,
         otpCode: otp,
         otpExpiry: addMinutes(new Date(), 30),
-        role: "HELP_SEEKER",
+        role: "NGO",
       },
     });
 
@@ -66,6 +72,7 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// SIGN IN NGO
 export const signIn = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
@@ -78,12 +85,10 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
     }
 
     if (!user.password) {
-      res
-        .status(400)
-        .json({
-          success: false,
-          message: "Please sign in with Google or register first",
-        });
+      res.status(400).json({
+        success: false,
+        message: "Please sign in with Google or register first",
+      });
       return;
     }
 
@@ -93,7 +98,7 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if (!user.isVerified || user.role !== "HELP_SEEKER") {
+    if (!user.isVerified || user.role !== "NGO") {
       res
         .status(403)
         .json({ success: false, message: "Please verify your account first" });
@@ -116,7 +121,7 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
       role: user.role,
       isAdminApproved: user.isAdminApproved,
       userName: user.name,
-      email: user.email
+      email: user.email,
     });
 
     res.cookie("refreshToken", refreshToken, {
@@ -141,6 +146,7 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// VERIFY EMAIL NGO
 export const verifyEmail = async (
   req: Request,
   res: Response
@@ -176,7 +182,7 @@ export const verifyEmail = async (
       },
     });
 
-    res.redirect("http://localhost:3001/sign-in");
+    res.redirect("http://localhost:3002/sign-in");
   } catch (error) {
     console.error("Error during email verification:", error);
     res
@@ -185,6 +191,7 @@ export const verifyEmail = async (
   }
 };
 
+// RESEND OTP NGO
 export const resendOtp = async (req: Request, res: Response): Promise<void> => {
   const { email } = req.body;
 
@@ -225,6 +232,7 @@ export const resendOtp = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// OAUTH SYNC NGO
 export const oauthSync = async (req: Request, res: Response): Promise<void> => {
   const { token } = req.body;
   if (!token) {
@@ -255,7 +263,7 @@ export const oauthSync = async (req: Request, res: Response): Promise<void> => {
           email,
           name,
           isOnboarded: false,
-          role: "HELP_SEEKER",
+          role: "NGO",
           otpCode: null,
           otpExpiry: null,
           isVerified: true,
@@ -304,6 +312,7 @@ export const oauthSync = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+// NGO REFRESH ACCESS TOKEN
 export const refreshAccessToken = async (
   req: Request,
   res: Response
@@ -317,108 +326,17 @@ export const refreshAccessToken = async (
     return;
   }
   console.log(token);
-  console.log('GOING INSIDE JWT');
+  console.log("GOING INSIDE JWT");
   jwt.verify(
     token,
     process.env.REFRESH_TOKEN_SECRET as string,
     async (err: any, payload: any) => {
       if (err) return res.sendStatus(403);
-      console.log('COMING FROM REFRESH TOKEN', payload);
+      console.log("COMING FROM REFRESH TOKEN", payload);
       const accessToken = generateAccessToken(payload.userId);
-      console.log('COMING FROM REFRESH TOKEN', accessToken);
+      console.log("COMING FROM REFRESH TOKEN", accessToken);
       res.json({ accessToken });
     }
   );
-  console.log('GOING OUTSIDE JWT');
-};
-
-export const registerHelpSeeker = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const {
-    age,
-    occupation,
-    company,
-    jobType,
-    contact,
-    whatsappSame,
-    whatsapp,
-    address,
-    city,
-    state,
-    alias,
-    photo,
-    idProofs,
-  } = req.body;
-  const emailFromToken = req.user?.email;
-  const userIdFromToken = req.user?.userId;
-  const userNameFromToken = req.user?.userName;
-  const userRoleFromToken = req.user?.role;
-  const isVerifiedFromToken = req.user?.isVerified;
-
-  try {
-    if (!isVerifiedFromToken || userRoleFromToken !== "HELP_SEEKER") {
-      res
-        .status(403)
-        .json({ success: false, message: "Please verify your account first" });
-      return;
-    }
-
-    console.log(emailFromToken, userIdFromToken, userNameFromToken)
-    if (!emailFromToken || !userIdFromToken || !userNameFromToken) {
-      res.status(400).json({ success: false, message: "Invalid user data" });
-      return;
-    }
-
-    const existingHelpSeeker = await prisma.helpSeeker.findUnique({
-      where: { userId: userIdFromToken },
-    });
-
-    if (existingHelpSeeker) {
-      res.status(400).json({
-        success: false,
-        message: "Help seeker already registered",
-      });
-      return;
-    }
-    
-    console.log(alias, 'COMING FROM AUTH CONTROLLER');
-    const helpSeeker = await prisma.helpSeeker.create({
-      data: {
-        userId: userIdFromToken,
-        name: userNameFromToken,
-        age,
-        address,
-        city,
-        state,
-        contact,
-        email: emailFromToken,
-        company,
-        jobType,
-        photo,
-        occupation,
-        whatsappSame,
-        whatsapp,
-        alias,
-        idProofs,
-      },
-    });
-
-    const user = await prisma.user.update({
-      where: { email: emailFromToken },
-      data: { isOnboarded: true },
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "Help seeker registered successfully",
-      data: helpSeeker,
-    });
-  } catch (error) {
-    console.error("Error during help seeker registration:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Internal server error", error: error });
-  }
+  console.log("GOING OUTSIDE JWT");
 };

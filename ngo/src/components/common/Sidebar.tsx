@@ -3,7 +3,6 @@
 import Image from "next/image";
 import React from "react";
 import {
-  HandHeart,
   History,
   Home,
   LogOut,
@@ -26,11 +25,6 @@ const navItems = [
     icon: <MessageSquareDot size={18} />,
   },
   { label: "History", path: "/history", icon: <History size={18} /> },
-  {
-    label: "NGO Initiatives",
-    path: "/ngo-initiatives",
-    icon: <HandHeart size={18} />,
-  },
   { label: "Profile", path: "/profile", icon: <User size={18} /> },
 ];
 

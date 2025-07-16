@@ -58,3 +58,5 @@ const worker = new Worker('matchRequest', async job => {
 }, {
     concurrency: 100, connection: redis
 })
+
+worker.pause();
