@@ -7,9 +7,17 @@ export const protectedApiSlice = createApi({
   endpoints: (builder) => ({
 
     getUser: builder.query({
-      query: () => 'api/v1/help/auth/getuser',
+      query: () => 'api/v1/ngo/auth/getuser',
+    }),
+
+    ngoRegister: builder.mutation({
+      query: (userData) => ({
+        url: '/api/v1/ngo/user/register-ngo',
+        method: 'POST',
+        body: userData
+      })
     })
   }),
 });
 
-export const { useGetUserQuery } = protectedApiSlice;
+export const { useGetUserQuery, useNgoRegisterMutation } = protectedApiSlice;

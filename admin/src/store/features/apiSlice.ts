@@ -27,8 +27,22 @@ export const apiSlice = createApi({
         // NGO ROUTES
         getAllNGOs: builder.query({
             query: () => 'api/v1/ngo/user/get-ngos'
+        }),
+
+        getNGOById: builder.query({
+            query: (id) => ({
+                url: `/api/v1/ngo/user/getUserById/${id}`,
+            })
+        }),
+
+        ngoAdminApprove: builder.mutation({
+            query: (userData) => ({
+                url: '/api/v1/ngo/user/admin-approve',
+                method: 'PATCH',
+                body: userData
+            })
         })
     })
 })
 
-export const { useGetAllHelpSeekerQuery, useGetHelpSeekerByIdQuery, useHelpSeekerAdminApproveMutation, useGetAllNGOsQuery } = apiSlice;
+export const { useGetAllHelpSeekerQuery, useGetHelpSeekerByIdQuery, useHelpSeekerAdminApproveMutation, useGetAllNGOsQuery, useGetNGOByIdQuery, useNgoAdminApproveMutation } = apiSlice;

@@ -7,7 +7,7 @@ export const apiSlice = createApi({
         // AUTH
         signUp: builder.mutation<SignUpData, SignUpData>({
             query: (userData) => ({
-                url: '/api/v1/help/auth/signup',
+                url: '/api/v1/ngo/auth/signup',
                 method: 'POST',
                 body: userData,
             })
@@ -15,7 +15,7 @@ export const apiSlice = createApi({
 
         signIn: builder.mutation<{accessToken: string}, SignInData>({
             query: (userData) => ({
-                url: "/api/v1/help/auth/signin",
+                url: "/api/v1/ngo/auth/signin",
                 method: 'POST',
                 body: userData
             })
@@ -23,7 +23,7 @@ export const apiSlice = createApi({
 
         oAuthSync: builder.mutation({
             query: (data) => ({
-                url: '/api/v1/help/auth/oauth-sync',
+                url: '/api/v1/ngo/auth/oauth-sync',
                 method: 'POST',
                 body: data
             })

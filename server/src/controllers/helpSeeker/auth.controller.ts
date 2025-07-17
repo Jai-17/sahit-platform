@@ -93,10 +93,15 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if (!user.isVerified || user.role !== "HELP_SEEKER") {
+    if (!user.isVerified) {
       res
         .status(403)
         .json({ success: false, message: "Please verify your account first" });
+      return;
+    }
+
+    if(user.role !== "HELP_SEEKER") {
+      res.status(403).json({success: false, message: "Registed with another role"});
       return;
     }
 

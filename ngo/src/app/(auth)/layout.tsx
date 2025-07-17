@@ -1,16 +1,16 @@
 "use client";
 
-// import { useAuth } from "@/lib/hooks/useAuth";
-// import { redirect } from "next/navigation";
+import { useAuth } from "@/lib/hooks/useAuth";
+import { redirect } from "next/navigation";
 import Image from "next/image";
 import React, { ReactNode } from "react";
 
 const AuthLayout = ({ children }: { children: ReactNode }) => {
-//   const user = useAuth();
+  const user = useAuth();
 
-//   if(user.accessToken && user.isVerified && user.role == 'HELP_SEEKER' && user.isOnboarded && user.isAdminApproved) {
-//     redirect('/');
-//   }
+  if(user.accessToken && user.isVerified && user.role == 'NGO' && user.isOnboarded && user.isAdminApproved) {
+    redirect('/');
+  }
 
   return (
     <div className="flex h-screen">

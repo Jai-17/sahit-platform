@@ -43,11 +43,11 @@ const Page = () => {
         userId: data.data.userId,
       }).unwrap();
 
-      toast.success("User Approved Successfully!");
+      toast.success("NGO Approved Successfully!");
       refetch();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      toast.error("Error Approving User", error);
+      toast.error("Error Approving NGO", error);
     }
   }
 
@@ -66,7 +66,7 @@ const Page = () => {
           <div className="flex gap-2">
             <AlertDialog>
               <AlertDialogTrigger className="bg-[#8300EA] h-10 px-7 text-white rounded-md hover:bg-[#8300EA90] transition duration-200 ease-in cursor-pointer">
-                Open
+                Approve
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>

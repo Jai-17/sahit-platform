@@ -40,12 +40,11 @@ export const getAllNgos = async (req: Request, res: Response):Promise<void> => {
 }
 
 export const registerNGO = async (req: Request, res: Response):Promise<void> => {
-    //const userIdFromToken = req.user?.userId;
-    const userIdFromToken = "19c2613d-380c-448b-b47f-59937568e6d6";
-    const emailFromToken = "test@gmail.com";
-    const nameFromToken = "Kalam Foundation"
-    const isVerifiedFromToken = true;
-    const userRoleFromToken = "NGO";
+    const userIdFromToken = req.user?.userId;
+    const emailFromToken = req.user?.email;
+    const nameFromToken = req.user?.userName;
+    const isVerifiedFromToken = req.user?.isVerified;
+    const userRoleFromToken = req.user?.role;
 
     const {replyTimeMins, supportTypes, address, city, state, phone, whatsappSame, whatsappNumber, about, representativeName, representativeTitle, representativeAvailability, verifiedDocs} = req.body;
 
@@ -74,7 +73,7 @@ export const registerNGO = async (req: Request, res: Response):Promise<void> => 
                 userId: userIdFromToken,
                 email: emailFromToken,
                 name: nameFromToken,
-                replyTimeMins,
+                replyTimeMins: parseInt(replyTimeMins),
                 supportTypes,
                 address,
                 city,
@@ -101,3 +100,74 @@ export const registerNGO = async (req: Request, res: Response):Promise<void> => 
         res.status(500).json({success: false, message: "Internal Server Error"});
     }
 }
+
+export const getNGOById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const id = req.params.id;
+
+  try {
+    const ngo = await prisma.nGO.findUnique({
+      where: { id: id },
+      include: { user: { select: { isAdminApproved: true, name: true } } },
+    });
+    if (!ngo) {
+      res
+        .status(404)
+        .json({ success: false, message: "NGO not found" });
+      return;
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "NGO found", data: ngo });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export const approveNGO = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const userId = req.body.userId;
+
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+      console.log(req.body);
+      console.log(user);
+    if (!user) {
+      res.status(404).json({ success: false, message: "User not found" });
+      return;
+    }
+
+    if (!user?.isOnboarded) {
+      res
+        .status(402)
+        .json({ success: false, message: "User is not onboarded yet" });
+        return;
+    }
+
+    if (user?.isAdminApproved) {
+      res
+        .status(401)
+        .json({ success: false, message: "User is already verified" });
+        return;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { isAdminApproved: true },
+    });
+    res.status(200).json({
+      success: true,
+      message: "User Admin Approved Successfully",
+      data: updatedUser.isAdminApproved,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
