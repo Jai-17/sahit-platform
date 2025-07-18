@@ -38,7 +38,7 @@ export const createRequest = async (
         userId,
         title,
         description,
-        status: { in: ["PENDING", "IN_PROGRESS"] },
+        status: { notIn: ["DECLINED_BY_ALL", "DECLINED_BY_NGO", "RESOLVED"] },
       },
     });
 
@@ -68,7 +68,7 @@ export const createRequest = async (
       "help-request",
       { helpRequestId: helpRequest.id },
       {
-        removeOnComplete: {age: 3600, count: 1000},
+        removeOnComplete: { age: 3600, count: 1000 },
         removeOnFail: { age: 86400 },
       }
     );
@@ -83,3 +83,125 @@ export const createRequest = async (
     res.status(500).json({ success: false, message: "Interal Server Error" });
   }
 };
+
+export const getUserHelpRequestById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const requestId = req.params.id;
+
+  try {
+    const helpRequest = await prisma.helpRequest.findUnique({
+      where: { id: requestId },
+      include: { user: true },
+    });
+    if (!helpRequest) {
+      res
+        .status(404)
+        .json({ success: false, message: "No help request exists" });
+      return;
+    }
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Help Request Found",
+        data: helpRequest,
+      });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export const acceptRequestNGO = async (req: Request, res: Response): Promise<void> => {
+  const roleId = req.body.roleId;
+  const requestId = req.body.requestId;
+
+  try {
+    const updatedRequest = await prisma.helpRequestNGOStatus.update({
+      where: {
+        helpRequestId_ngoId: {
+          helpRequestId: requestId,
+          ngoId: roleId
+        }
+      },
+      data: {
+        status: "ACCEPTED",
+      }
+    });
+
+    if(!updatedRequest) {
+      res.status(404).json({success: false, message: "No help request exists"});
+      return;
+    }
+
+    res.status(200).json({ success: true, message: "Request accepted by NGO", data: updatedRequest });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({success: false, message: "Internal Server Error"});
+  }
+}
+
+export const getRequestAcceptByNGO = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const requestId = req.params.requestId;
+
+  try {
+    const acceptedByNGOs = await prisma.helpRequestNGOStatus.findMany({
+      where: {
+        helpRequestId: requestId,
+        status: "ACCEPTED",
+      },
+      include: {
+        ngo: true,
+      },
+    });
+
+    if(!acceptedByNGOs) {
+      res.status(404).json({success: false, message: "Data is missing or invalid"});
+      return;
+    }
+
+    res.status(200).json({success: true, message: "Found NGOS", data: acceptedByNGOs});
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export const acceptRequestUser = async (req: Request, res: Response): Promise<void> => {
+  const ngoId = req.body.ngoId;
+  const helpRequestId = req.body.requestId;
+
+  try {
+    // 1. Assign the ngo to HelpRequestTable and update status
+    await prisma.helpRequest.update({
+      where: {id: helpRequestId},
+      data: {
+        assignedNGO: {
+          connect: {id: ngoId},
+        },
+        status: "IN_PROGRESS",
+        requestedNGOs: {
+          set: [{id: ngoId}],
+        }
+      }
+    })
+
+    // 2. Delete other ngo status
+    await prisma.helpRequestNGOStatus.deleteMany({
+      where: {
+        helpRequestId,
+      }
+    })
+
+    res.status(200).json({success: true, message: "Help Request Successfully assigned to NGO"})
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({success: false, message: "Internal Server Error"});
+  }
+}

@@ -45,6 +45,14 @@ const worker = new Worker('matchRequest', async job => {
                 status: "SEND_TO_NGOS",
             }
         })
+
+        await prisma.helpRequestNGOStatus.createMany({
+            data: matchingNGOs.map(ngo => ({
+                helpRequestId: request!.id,
+                ngoId: ngo.id,
+                status: 'PENDING'
+            }))
+        })
     } else {
         await prisma.helpRequest.update({
             where: {id: request?.id},

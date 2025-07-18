@@ -27,8 +27,15 @@ export const apiSlice = createApi({
                 method: 'POST',
                 body: data
             })
+        }),
+
+        // HELP REQUESTS
+        getIncomingRequestById: builder.query({
+            query: (id) => ({
+                url: `/api/v1/request/user/${id}`
+            })
         })
     })
 })
 
-export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation } = apiSlice;
+export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation, useGetIncomingRequestByIdQuery } = apiSlice;

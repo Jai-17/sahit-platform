@@ -16,8 +16,12 @@ export const protectedApiSlice = createApi({
         method: 'POST',
         body: userData
       })
+    }),
+
+    incomingRequest: builder.query({
+      query: () => '/api/v1/ngo/request/incoming-requests'
     })
   }),
 });
 
-export const { useGetUserQuery, useNgoRegisterMutation } = protectedApiSlice;
+export const { useGetUserQuery, useNgoRegisterMutation, useIncomingRequestQuery } = protectedApiSlice;

@@ -17,5 +17,5 @@ export const generateRefreshToken = ({userId, isOnboarded, isVerified, isAdminAp
 }
 
 export const generateAccessToken = ({userId, isOnboarded, isVerified, isAdminApproved, role, userName, email}:TokenPayload) => {
-    return jwt.sign({userId, isOnboarded, isVerified, isAdminApproved, role, userName, email}, process.env.ACCESS_TOKEN_SECRET as string, {expiresIn: "15m"});
+    return jwt.sign({userId, isOnboarded, isVerified, isAdminApproved, role, userName, email}, process.env.ACCESS_TOKEN_SECRET as string, {expiresIn: "30d"});
 }

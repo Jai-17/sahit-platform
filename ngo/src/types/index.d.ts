@@ -41,3 +41,40 @@ interface AuthState {
     accessToken: string | null;
     user: TokenPayload | null;
 }
+
+interface HelpSeeker {
+    address: string;
+    age: number;
+    alias: string;
+    city: string;
+    company: string;
+    createdAt: DateTime;
+    email: string;
+    id: string;
+    idProofs: string;
+    jobType: string;
+    name: string;
+    occupation: string;
+    photo: string;
+    state: string;
+    userId: string;
+    whatsapp: string;
+    whatsappSame: boolean;
+}
+
+interface HelpRequest {
+    attachments: string[];
+    description: string;
+    helpType: string;
+    hideFace: boolean;
+    hideId: boolean;
+    hideName: boolean;
+    id: string;
+    ngoId: string;
+    status: string;
+    submittedAt: DateTime;
+    title: string;
+    urgency: string;
+    user: HelpSeeker;
+    userId: string
+}

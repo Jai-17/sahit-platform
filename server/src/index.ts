@@ -15,8 +15,9 @@ import createRoutes from './routes/helpRequest/request.routes';
 /* ROUTE IMPORTS NGOS */
 import userNGORoutes from './routes/ngo/user.routes';
 import authNGORoutes from './routes/ngo/auth.routes';
+import requestNGORoutes from './routes/ngo/ngorequest.route';
 
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
 
 dotenv.config();
 const app = express();
@@ -47,6 +48,7 @@ app.use('/api/v1/request', createRoutes);
 // NGO Request Routes
 app.use('/api/v1/ngo/user', userNGORoutes);
 app.use('/api/v1/ngo/auth', authNGORoutes);
+app.use('/api/v1/ngo/request', requestNGORoutes);
 
 const port = Number(process.env.PORT) || 8000;
 app.listen(port, "0.0.0.0", () => {

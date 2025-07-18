@@ -1,11 +1,26 @@
-import React from 'react'
+"use client";
 
-const RequestsPage = () => {
+import React from 'react'
+import IncomingRequestCard from '@/components/ngo-db/IncomingRequestCard'
+import { useIncomingRequestQuery } from '@/store/features/protectedApiSlice';
+
+const RequestPage = () => {
+  const {data: incomingRequests, isLoading} = useIncomingRequestQuery(undefined);
+  console.log(incomingRequests);
+
+  if(isLoading) return <div>Loading...</div>
+
   return (
     <div>
-      
+      <h1 className="text-2xl lg:text-3xl font-semibold mb-2">Incoming Requests</h1>
+      <p className="text-neutral-500 text-sm lg:text-base">
+        Check out your incoming &quot;HELP&quot; requests
+      </p>
+      {incomingRequests.data.length > 0 ? (<div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mt-7 gap-4'>
+        {incomingRequests.data.map((data: HelpRequest) => <IncomingRequestCard key={data.id} helpRequest={data} />)}
+      </div>) : <div>No Incoming Requests for now</div>}
     </div>
   )
 }
 
-export default RequestsPage
+export default RequestPage
