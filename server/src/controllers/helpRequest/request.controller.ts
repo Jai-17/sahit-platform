@@ -116,15 +116,18 @@ export const getUserHelpRequestById = async (
 };
 
 export const acceptRequestNGO = async (req: Request, res: Response): Promise<void> => {
-  const roleId = req.body.roleId;
+  const userId = req.user?.userId
+  console.log('COMING FROM CONTROLLER USER ID', userId);
   const requestId = req.body.requestId;
 
   try {
+    const roleId = await prisma.nGO.findUnique({where: {userId}, select: {id: true}})
+  
     const updatedRequest = await prisma.helpRequestNGOStatus.update({
       where: {
         helpRequestId_ngoId: {
           helpRequestId: requestId,
-          ngoId: roleId
+          ngoId: roleId?.id!
         }
       },
       data: {
@@ -148,12 +151,18 @@ export const getRequestAcceptByNGO = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const requestId = req.params.requestId;
-
+  const userId = req.user?.userId;
   try {
+    const helpRequests = await prisma.helpSeeker.findMany({where: {userId}, select: { helpRequests: {select: {id: true}} }})
+    const helpRequestIds = helpRequests.flatMap((hs) =>
+  hs.helpRequests.map((req) => req.id)
+);
+    console.log(helpRequestIds);
     const acceptedByNGOs = await prisma.helpRequestNGOStatus.findMany({
       where: {
-        helpRequestId: requestId,
+        helpRequestId: {
+          in: helpRequestIds
+        },
         status: "ACCEPTED",
       },
       include: {

@@ -20,17 +20,31 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { useAcceptIncomingRequestMutation } from "@/store/features/protectedApiSlice";
 
 const Page = () => {
   const params = useParams();
   const id = params.id;
   const { data, isLoading, refetch } = useGetIncomingRequestByIdQuery(id);
+  const [acceptIncomingRequest] = useAcceptIncomingRequestMutation();
 
   if (isLoading) return <div>Loading...</div>;
   console.log(data);
 
   async function onSubmit() {
     console.log("Request ACCEPTED");
+    try {
+
+      await acceptIncomingRequest({
+        requestId: id
+      }).unwrap()
+      toast.success("Request Accepted and Sent to User");
+      refetch();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error('Error Accepting Request', error);
+    }
   }
 
   return (
@@ -113,7 +127,7 @@ const Page = () => {
           <StatusTab
             title={
               data.data.status == "SEND_TO_NGOS"
-                ? "Not Accepted By You"
+                ? "Not Accepted"
                 : "Accepted"
             }
             color="PRIMARY"

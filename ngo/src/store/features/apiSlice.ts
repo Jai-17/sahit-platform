@@ -34,7 +34,7 @@ export const apiSlice = createApi({
             query: (id) => ({
                 url: `/api/v1/request/user/${id}`
             })
-        })
+        }),
     })
 })
 

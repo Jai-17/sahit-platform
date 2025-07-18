@@ -27,8 +27,22 @@ export const apiSlice = createApi({
                 method: 'POST',
                 body: data
             })
+        }),
+
+        getNGOById: builder.query({
+            query: (id) => ({
+                url: `/api/v1/ngo/user/getUserById/${id}`,
+            })
+        }),
+
+        acceptRequestUser: builder.mutation({
+            query: (userData) => ({
+                url: '/api/v1/request/accept/user',
+                method: 'POST',
+                body: userData
+            })
         })
     })
 })
 
-export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation } = apiSlice;
+export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation, useGetNGOByIdQuery, useAcceptRequestUserMutation } = apiSlice;

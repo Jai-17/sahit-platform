@@ -20,8 +20,16 @@ export const protectedApiSlice = createApi({
 
     incomingRequest: builder.query({
       query: () => '/api/v1/ngo/request/incoming-requests'
-    })
+    }),
+
+    acceptIncomingRequest: builder.mutation({
+            query: (userData) => ({
+                url: '/api/v1/request/accept/ngo',
+                method: 'PATCH',
+                body: userData
+            })
+        })
   }),
 });
 
-export const { useGetUserQuery, useNgoRegisterMutation, useIncomingRequestQuery } = protectedApiSlice;
+export const { useGetUserQuery, useNgoRegisterMutation, useIncomingRequestQuery, useAcceptIncomingRequestMutation } = protectedApiSlice;

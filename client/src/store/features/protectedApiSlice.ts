@@ -15,9 +15,13 @@ export const protectedApiSlice = createApi({
     }),
 
     getUser: builder.query({
-      query: () => 'api/v1/help/auth/getuser',
+      query: () => '/api/v1/help/auth/getuser',
+    }),
+
+    getAcceptedRequestByNGO: builder.query({
+      query: () => '/api/v1/request/ngo-accepted'
     })
   }),
 });
 
-export const { useHelpSeekerRegisterMutation, useGetUserQuery } = protectedApiSlice;
+export const { useHelpSeekerRegisterMutation, useGetUserQuery, useGetAcceptedRequestByNGOQuery } = protectedApiSlice;
