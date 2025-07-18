@@ -25,6 +25,7 @@ interface User {
     isOnboarded: boolean;
     helpSeeker?: HelpSeeker;
     accessToken?: string;
+    roleId?: string;
 }
 
 interface TokenPayload {
@@ -35,6 +36,7 @@ interface TokenPayload {
     role: string;
     userName?: string;
     email?: string;
+    roleId?: string;
 }
 
 interface AuthState {

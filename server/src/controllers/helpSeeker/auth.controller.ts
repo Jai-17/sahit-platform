@@ -70,7 +70,7 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email }, include: {helpSeeker: {select: {id: true}}}});
 
     if (!user) {
       res.status(400).json({ success: false, message: "User not found" });
@@ -113,6 +113,7 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
       isAdminApproved: user.isAdminApproved,
       userName: user.name,
       email: user.email,
+      roleId: user.helpSeeker?.id
     });
     const refreshToken = generateRefreshToken({
       userId: user.id,
@@ -121,7 +122,8 @@ export const signIn = async (req: Request, res: Response): Promise<void> => {
       role: user.role,
       isAdminApproved: user.isAdminApproved,
       userName: user.name,
-      email: user.email
+      email: user.email,
+      roleId: user.helpSeeker?.id
     });
 
     res.cookie("refreshToken", refreshToken, {

@@ -55,8 +55,7 @@ const Page = () => {
             Incoming Requests
           </h1>
         </div>
-        {(data?.data.status != "IN_PROGRESS" ||
-          data?.data.status != "RESOLVED") && (
+        {!["IN_PROGRESS", "RESOLVED", "ACCEPTED_BY_NGO"].includes(data?.data.status) && (
           <div className="flex gap-2 mt-5 md:mt-0">
             <AlertDialog>
               <AlertDialogTrigger className="border outline-none border-red-500 text-red-500 bg-transparent hover:bg-red-50 h-10 px-7 rounded-md transition duration-200 ease-in cursor-pointer">

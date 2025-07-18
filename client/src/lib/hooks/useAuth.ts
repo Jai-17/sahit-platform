@@ -12,5 +12,6 @@ export const useAuth = () => {
         isVerified: user?.isVerified,
         isAdminApproved: user?.isAdminApproved,
         role: user?.role,
+        roleId: user?.roleId
     }
 }
