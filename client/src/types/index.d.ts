@@ -47,3 +47,21 @@ interface AuthState {
     accessToken: string | null;
     user: TokenPayload | null;
 }
+
+interface HelpRequest {
+    id: string;
+    attachments: string[];
+    description: string;
+    helpType: string;
+    hideFace: string;
+    hideId: string;
+    hideName: string;
+    ngoId: string;
+    status: string;
+    submittedAt: DateTime;
+    title: string;
+    urgency: string;
+    userId: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    assignedNGO: any;
+}

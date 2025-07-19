@@ -20,8 +20,20 @@ export const protectedApiSlice = createApi({
 
     getAcceptedRequestByNGO: builder.query({
       query: () => '/api/v1/request/ngo-accepted'
+    }),
+
+    getRequestHistory: builder.query({
+      query: () => '/api/v1/help/request/all-requests'
+    }),
+
+    getActiveHelpRequest: builder.query({
+      query: () => '/api/v1/help/request/active-request'
+    }),
+    
+    getHelpRequestCount: builder.query({
+      query: () => '/api/v1/help/request/count-requests'
     })
   }),
 });
 
-export const { useHelpSeekerRegisterMutation, useGetUserQuery, useGetAcceptedRequestByNGOQuery } = protectedApiSlice;
+export const { useHelpSeekerRegisterMutation, useGetUserQuery, useGetAcceptedRequestByNGOQuery, useGetRequestHistoryQuery, useGetActiveHelpRequestQuery, useGetHelpRequestCountQuery } = protectedApiSlice;

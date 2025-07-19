@@ -1,18 +1,28 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
 import StatsCard from "@/components/common/StatsCard";
+import IncomingRequestCard from "@/components/support-db/IncomingRequestCard";
 import SentRequestStatus from "@/components/support-db/SentRequestStatus";
 import { Button } from "@/components/ui/button";
+import {
+  useGetAcceptedRequestByNGOQuery,
+  useGetActiveHelpRequestQuery,
+  useGetHelpRequestCountQuery,
+} from "@/store/features/protectedApiSlice";
 import { BellIcon } from "lucide-react";
 import React from "react";
 
-const totalReq = {
-  title: "Total Requests",
-  statNumber: 24,
-  progress: true,
-  progressNumber: 3,
-  icon: <BellIcon size={40} />,
-};
-
 const HomePage = () => {
+  const { data: incomingRequest, isLoading: isLoadingIncomingRequest } =
+    useGetAcceptedRequestByNGOQuery(undefined);
+  const { data: activeRequest, isLoading: isLoadingActiveRequest } =
+    useGetActiveHelpRequestQuery(undefined);
+  const {data: countRequest} = useGetHelpRequestCountQuery(undefined);
+  console.log("INCOMING REQUEST", incomingRequest);
+  console.log("ACTIVE REQUEST", activeRequest);
+  console.log("COUNT", countRequest)
+
   return (
     <>
       {/* Top Cards Stats */}
@@ -32,29 +42,56 @@ const HomePage = () => {
         </div>
 
         <div className="h-full">
-          <StatsCard {...totalReq} />
+          <StatsCard title="Total Requests" statNumber={countRequest?.data.count} progress={true} progressNumber={3} icon={<BellIcon size={40} />}  />
         </div>
       </div>
 
       {/* Notifications Panel */}
       <div className="bg-white shadow-lg/5 p-7 rounded-lg mt-7 flex flex-col gap-5">
-        <h1 className="text-xl lg:text-3xl font-semibold">Latest Notifications 🔔</h1>
+        <h1 className="text-xl lg:text-3xl font-semibold">
+          Latest Notifications 🔔
+        </h1>
         <p className="text-neutral-700">
           1 New Chat Request from Kalam NGO. Check out now!
         </p>
       </div>
 
       {/* Request Status */}
-      <h1 className="text-2xl lg:text-3xl font-semibold mb-2 mt-10">Request Status</h1>
+      <h1 className="text-2xl lg:text-3xl font-semibold mb-2 mt-10">
+        Request Status
+      </h1>
       <p className="text-neutral-500 text-sm lg:text-base">
         Check out your incoming requests and choose them from here
       </p>
 
       <div className="bg-white mt-5 p-5 rounded-lg">
-        <h1 className="text-2xl font-semibold">Active Requests</h1>
-        <div className="px-6">
-          <SentRequestStatus />
-        </div>      
+        {isLoadingActiveRequest ? (
+          <div>Loading...</div>
+        ) : (
+          activeRequest?.data && (
+            <>
+              <h1 className="text-2xl font-semibold">Active Requests</h1>
+              <div className="px-6">
+                <SentRequestStatus data={activeRequest.data} />
+              </div>
+            </>
+          )
+        )}
+        {isLoadingIncomingRequest ? (
+          <div>Loading...</div>
+        ) : (
+          incomingRequest?.data.length > 0 && (
+            <>
+              <h1 className="text-2xl font-semibold">Incoming Requests</h1>(
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mt-7 gap-4">
+                {incomingRequest.data.map((data: any) => (
+                  <IncomingRequestCard key={data.id} data={data} />
+                ))}
+              </div>
+              )
+            </>
+          )
+        )}
       </div>
     </>
   );

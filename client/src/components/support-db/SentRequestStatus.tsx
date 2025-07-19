@@ -1,7 +1,7 @@
 import React from "react";
 import SentRequestTableCard from "./SentRequestTableCard";
 
-const SentRequestStatus = () => {
+const SentRequestStatus = ({data}:{data:HelpRequest}) => {
   return (
     <div>
       <div className="hidden lg:grid grid-cols-6 mt-10 text-neutral-600 w-full text-sm px-5 lg:px-7 border-b pb-6 mb-2">
@@ -14,7 +14,7 @@ const SentRequestStatus = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <SentRequestTableCard />
+        <SentRequestTableCard data={data} />
       </div>
     </div>
   );

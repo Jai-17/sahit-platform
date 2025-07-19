@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 /* ROUTE IMPORTS HELP SEEKER */
 import authRoutes from './routes/helpSeeker/auth.routes';
 import userRoutes from './routes/helpSeeker/user.routes';
+import requestUserRoutes from './routes/helpSeeker/userrequest.routes';
 
 /* ROUTE IMPORTS HELP REQUEST */
 import createRoutes from './routes/helpRequest/request.routes';
@@ -41,6 +42,7 @@ app.get("/", (req, res) => {
 // Help Seeker Routes
 app.use('/api/v1/help/auth', authRoutes);
 app.use('/api/v1/help/user', userRoutes);
+app.use('/api/v1/help/request', requestUserRoutes);
 
 // Help Request Routes
 app.use('/api/v1/request', createRoutes);

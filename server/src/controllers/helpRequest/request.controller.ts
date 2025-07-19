@@ -33,6 +33,18 @@ export const createRequest = async (
       return;
     }
 
+    const alreadyExistingRequest = await prisma.helpRequest.findFirst({
+      where: {
+        userId,
+        status: {in: ["ACCEPTED_BY_NGO", "IN_PROGRESS", "SEND_TO_NGOS", "PENDING"]},
+      }
+    })
+
+    if(alreadyExistingRequest) {
+      res.status(501).json({success: false, message: "A request already exists"});
+      return;
+    }
+
     const similar = await prisma.helpRequest.findFirst({
       where: {
         userId,
