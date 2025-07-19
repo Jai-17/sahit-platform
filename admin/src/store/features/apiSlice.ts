@@ -41,8 +41,12 @@ export const apiSlice = createApi({
                 method: 'PATCH',
                 body: userData
             })
+        }),
+
+        getDBStats: builder.query({
+            query: () => '/api/v1/request/admin-stats'
         })
     })
 })
 
-export const { useGetAllHelpSeekerQuery, useGetHelpSeekerByIdQuery, useHelpSeekerAdminApproveMutation, useGetAllNGOsQuery, useGetNGOByIdQuery, useNgoAdminApproveMutation } = apiSlice;
+export const { useGetAllHelpSeekerQuery, useGetHelpSeekerByIdQuery, useHelpSeekerAdminApproveMutation, useGetAllNGOsQuery, useGetNGOByIdQuery, useNgoAdminApproveMutation, useGetDBStatsQuery } = apiSlice;

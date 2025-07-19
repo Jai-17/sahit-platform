@@ -2,104 +2,136 @@ import { Request, Response } from "express";
 import redis from "../../utils/redis";
 import { prisma } from "../../db";
 
-export const getAllNgos = async (req: Request, res: Response):Promise<void> => {
-    const cacheKey = "cache:AllNGOs";
+export const getAllNgos = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const cacheKey = "cache:AllNGOs";
 
-    try {
-        const cached = await redis.get(cacheKey);
+  try {
+    const cached = await redis.get(cacheKey);
 
-        if(cached) {
-            console.log("Returning from cache");
-            res.json({
-                success: true,
-                message: "Found NGOs from REDIS",
-                data: JSON.parse(cached),
-            })
-            return;
-        }
-
-        const data = await prisma.nGO.findMany({
-            include: {
-                user: {
-                    select: {isAdminApproved: true}
-                }
-            }
-        });
-        if(!data) {
-            res.status(404).json({success: false, message: "No NGOs found"});
-            return;
-        }
-
-        await redis.set(cacheKey, JSON.stringify(data), 'EX', 300);
-
-        res.status(200).json({success: true, message: 'Found NGOs from DB', data: data});
-    } catch (error) {
-        console.error("Error:", error);
-        res.status(500).json({success: false, message: "Internal Server Error"});
+    if (cached) {
+      console.log("Returning from cache");
+      res.json({
+        success: true,
+        message: "Found NGOs from REDIS",
+        data: JSON.parse(cached),
+      });
+      return;
     }
-}
 
-export const registerNGO = async (req: Request, res: Response):Promise<void> => {
-    const userIdFromToken = req.user?.userId;
-    const emailFromToken = req.user?.email;
-    const nameFromToken = req.user?.userName;
-    const isVerifiedFromToken = req.user?.isVerified;
-    const userRoleFromToken = req.user?.role;
-
-    const {replyTimeMins, supportTypes, address, city, state, phone, whatsappSame, whatsappNumber, about, representativeName, representativeTitle, representativeAvailability, verifiedDocs} = req.body;
-
-    try {
-        if(!isVerifiedFromToken || userRoleFromToken !== "NGO") {
-            res.status(403).json({success: false, message: "Please verify your account first"});
-            return;
-        }
-
-        if(!emailFromToken || !userIdFromToken) {
-            res.status(400).json({success: false, message: "User Data not found"});
-            return;
-        }
-
-        const existingNGO = await prisma.nGO.findUnique({
-            where: {userId: userIdFromToken},
-        })
-
-        if(existingNGO) {
-            res.status(400).json({success: false, message: "NGO already registered"});
-            return;
-        }
-
-        const ngo = await prisma.nGO.create({
-            data: {
-                userId: userIdFromToken,
-                email: emailFromToken,
-                name: nameFromToken,
-                replyTimeMins: parseInt(replyTimeMins),
-                supportTypes,
-                address,
-                city,
-                state,
-                phone,
-                whatsappSame,
-                whatsappNumber,
-                about,
-                representativeName,
-                representativeTitle,
-                representativeAvailability,
-                verifiedDocs
-            }
-        })
-
-        const user = await prisma.user.update({
-            where: {email: emailFromToken},
-            data: {isOnboarded: true},
-        })
-
-        res.status(200).json({success: true, message: "NGO Registered Successfully", data: ngo});
-    } catch (error) {
-        console.error("Error:", error);
-        res.status(500).json({success: false, message: "Internal Server Error"});
+    const data = await prisma.nGO.findMany({
+      include: {
+        user: {
+          select: { isAdminApproved: true },
+        },
+      },
+    });
+    if (!data) {
+      res.status(404).json({ success: false, message: "No NGOs found" });
+      return;
     }
-}
+
+    await redis.set(cacheKey, JSON.stringify(data), "EX", 300);
+
+    res
+      .status(200)
+      .json({ success: true, message: "Found NGOs from DB", data: data });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export const registerNGO = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const userIdFromToken = req.user?.userId;
+  const emailFromToken = req.user?.email;
+  const nameFromToken = req.user?.userName;
+  const isVerifiedFromToken = req.user?.isVerified;
+  const userRoleFromToken = req.user?.role;
+
+  const {
+    replyTimeMins,
+    supportTypes,
+    address,
+    city,
+    state,
+    phone,
+    whatsappSame,
+    whatsappNumber,
+    about,
+    representativeName,
+    representativeTitle,
+    representativeAvailability,
+    verifiedDocs,
+  } = req.body;
+
+  try {
+    if (!isVerifiedFromToken || userRoleFromToken !== "NGO") {
+      res
+        .status(403)
+        .json({ success: false, message: "Please verify your account first" });
+      return;
+    }
+
+    if (!emailFromToken || !userIdFromToken) {
+      res.status(400).json({ success: false, message: "User Data not found" });
+      return;
+    }
+
+    const existingNGO = await prisma.nGO.findUnique({
+      where: { userId: userIdFromToken },
+    });
+
+    if (existingNGO) {
+      res
+        .status(400)
+        .json({ success: false, message: "NGO already registered" });
+      return;
+    }
+
+    const ngo = await prisma.nGO.create({
+      data: {
+        userId: userIdFromToken,
+        email: emailFromToken,
+        name: nameFromToken,
+        replyTimeMins: parseInt(replyTimeMins),
+        supportTypes,
+        address,
+        city,
+        state,
+        phone,
+        whatsappSame,
+        whatsappNumber,
+        about,
+        representativeName,
+        representativeTitle,
+        representativeAvailability,
+        verifiedDocs,
+      },
+    });
+
+    const user = await prisma.user.update({
+      where: { email: emailFromToken },
+      data: { isOnboarded: true },
+    });
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "NGO Registered Successfully",
+        data: ngo,
+      });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 
 export const getNGOById = async (
   req: Request,
@@ -113,15 +145,11 @@ export const getNGOById = async (
       include: { user: { select: { isAdminApproved: true, name: true } } },
     });
     if (!ngo) {
-      res
-        .status(404)
-        .json({ success: false, message: "NGO not found" });
+      res.status(404).json({ success: false, message: "NGO not found" });
       return;
     }
 
-    res
-      .status(200)
-      .json({ success: true, message: "NGO found", data: ngo });
+    res.status(200).json({ success: true, message: "NGO found", data: ngo });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -136,8 +164,8 @@ export const approveNGO = async (
 
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
-      console.log(req.body);
-      console.log(user);
+    console.log(req.body);
+    console.log(user);
     if (!user) {
       res.status(404).json({ success: false, message: "User not found" });
       return;
@@ -147,14 +175,14 @@ export const approveNGO = async (
       res
         .status(402)
         .json({ success: false, message: "User is not onboarded yet" });
-        return;
+      return;
     }
 
     if (user?.isAdminApproved) {
       res
         .status(401)
         .json({ success: false, message: "User is already verified" });
-        return;
+      return;
     }
 
     const updatedUser = await prisma.user.update({
@@ -169,5 +197,42 @@ export const approveNGO = async (
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export const ngoDashboardStat = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const ngoId = req.user.roleId;
+  try {
+    const activeRequests = await prisma.helpRequest.count({
+      where: {
+        ngoId: ngoId as string,
+        status: "IN_PROGRESS",
+      },
+    });
+
+    const newRequests = await prisma.helpRequestNGOStatus.count({
+      where: {
+        ngoId: ngoId as string,
+      },
+    });
+
+    const totalHelped = await prisma.helpRequest.count({
+      where: {
+        ngoId: ngoId as string,
+        status: "RESOLVED",
+      },
+    });
+
+    res.json({
+      activeRequests,
+      newRequests,
+      totalHelped,
+    });
+  } catch (error) {
+    console.error("Error fetching NGO dashboard stats:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };

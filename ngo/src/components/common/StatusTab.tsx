@@ -1,31 +1,30 @@
-import { cn } from '@/lib/utils';
-import React, { ReactNode } from 'react'
-
-export const colorBG = {
-  RED:     "bg-[#EA0000]",
-  ORANGE:  "bg-[#F4914A]",
-  GREEN:   "bg-[#16A303]",
-  PRIMARY: "bg-[#8300EA]",
-  WHITE:    "bg-[#F3F3F3]",
-  YELLOW:  "bg-[#F1D011]",
-  GRAY: "bg-[#ECECEC]"
-} as const;
-
-type ColorKey = keyof typeof colorBG
+import { colorBG, ColorKey, HelpStatus, statusColorMap, statusLabelMap } from "@/lib/constants";
+import { cn } from "@/lib/utils";
+import { ReactNode } from "react";
 
 interface StatusProps {
-    title: string;
-    icon?: ReactNode;
-    color: ColorKey
+  title: string;           // e.g. "PENDING"
+  icon?: ReactNode;
+  color?: ColorKey;
 }
+const StatusTab = ({ title, icon, color }: StatusProps) => {
+  // Use provided color, otherwise check if title matches a known status
+  const resolvedColor: ColorKey = color ?? statusColorMap[title as HelpStatus] ?? "GRAY";
+  const prettyTitle: string = statusLabelMap[title as HelpStatus] ?? title;
 
-const StatusTab = ({title, icon, color}:StatusProps) => {
   return (
-    <div className={cn(colorBG[color], 'py-1 px-4 rounded-lg flex items-center text-xs md:text-base', (color === 'GRAY' || color === 'WHITE') ? 'text-neutral-600' : 'text-white')}>
-      {icon && <div className='mr-2'>{icon}</div>}
-      {title}
+    <div
+      className={cn(
+        colorBG[resolvedColor],
+        'py-1 px-4 rounded-lg flex items-center w-fit text-xs md:text-base',
+        (resolvedColor === 'GRAY' || resolvedColor === 'WHITE') ? 'text-neutral-600' : 'text-white'
+      )}
+    >
+      {icon && <div className="mr-2">{icon}</div>}
+      {prettyTitle}
     </div>
-  )
-}
+  );
+};
 
-export default StatusTab
+
+export default StatusTab;

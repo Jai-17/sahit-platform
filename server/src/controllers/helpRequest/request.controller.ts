@@ -226,3 +226,84 @@ export const acceptRequestUser = async (req: Request, res: Response): Promise<vo
     res.status(500).json({success: false, message: "Internal Server Error"});
   }
 }
+
+export const getAdminStats = async (req: Request, res: Response):Promise<void> => {
+    try {
+    const [
+      activeNGOsCount,
+      activeRequestsCount,
+      totalHelpedCount,
+      inactiveNGOsCount,
+      totalHelpSeekersCount,
+      ongoingRequestsCount,
+      totalRequestsCount,
+      pendingNGORequestsCount,
+    ] = await Promise.all([
+      prisma.nGO.count({
+        where: {
+          helpRequests: {
+            some: {},
+          },
+        },
+      }),
+
+      prisma.helpRequest.count({
+        where: {
+          ngoId: { not: null },
+          status: "IN_PROGRESS",
+        },
+      }),
+
+      prisma.helpRequest.count({
+        where: {
+          status: "RESOLVED",
+        },
+      }),
+
+      prisma.nGO.count({
+        where: {
+          OR: [
+            { helpRequests: { none: {} } },
+            {
+              helpRequests: {
+                none: {
+                  status: "IN_PROGRESS",
+                },
+              },
+            },
+          ],
+        },
+      }),
+
+      prisma.helpSeeker.count(),
+
+      prisma.helpRequest.count({
+        where: {
+          status: "IN_PROGRESS",
+        },
+      }),
+
+      prisma.helpRequest.count(),
+
+      prisma.helpRequestNGOStatus.count({
+        where: {
+          status: "PENDING",
+        },
+      }),
+    ]);
+
+    res.status(200).json({
+      activeNGOsCount,
+      activeRequestsCount,
+      totalHelpedCount,
+      inactiveNGOsCount,
+      totalHelpSeekersCount,
+      ongoingRequestsCount,
+      totalRequestsCount,
+      pendingNGORequestsCount,
+    });
+  } catch (error) {
+    console.error("Failed to fetch admin stats:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
