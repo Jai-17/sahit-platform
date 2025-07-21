@@ -6,7 +6,10 @@ import { CheckCircle } from "lucide-react";
 import React from "react";
 
 const HomePage = () => {
-  const {data} = useGetDBStatsQuery(undefined);
+  const {data, isLoading} = useGetDBStatsQuery(undefined);
+
+  if(isLoading) return <div>Loading...</div>
+
   console.log(data);
   return (
     <div>
@@ -26,28 +29,28 @@ const HomePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-5">
           <StatsCard
             title="Active NGOs"
-            statNumber={data.activeNGOsCount}
+            statNumber={data?.activeNGOsCount}
             progress={true}
             progressNumber={3}
             icon={<CheckCircle size={40} />}
           />
           <StatsCard
             title="Active Requests"
-            statNumber={data.activeRequestsCount}
+            statNumber={data?.activeRequestsCount}
             progress={true}
             progressNumber={3}
             icon={<CheckCircle size={40} />}
           />
           <StatsCard
             title="Total Helped"
-            statNumber={data.totalHelpedCount}
+            statNumber={data?.totalHelpedCount}
             progress={true}
             progressNumber={3}
             icon={<CheckCircle size={40} />}
           />
           <StatsCard
             title="Inactive NGOs"
-            statNumber={data.inactiveNGOsCount}
+            statNumber={data?.inactiveNGOsCount}
             progress={true}
             progressNumber={3}
             icon={<CheckCircle size={40} />}
@@ -64,28 +67,28 @@ const HomePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-5">
           <StatsCard
             title="Total"
-            statNumber={data.totalHelpSeekersCount}
+            statNumber={data?.totalHelpSeekersCount}
             progress={true}
             progressNumber={3}
             icon={<CheckCircle size={40} />}
           />
           <StatsCard
             title="Ongoing Requests"
-            statNumber={data.ongoingRequestsCount}
+            statNumber={data?.ongoingRequestsCount}
             progress={true}
             progressNumber={3}
             icon={<CheckCircle size={40} />}
           />
           <StatsCard
             title="Total Requests"
-            statNumber={data.totalRequestsCount}
+            statNumber={data?.totalRequestsCount}
             progress={true}
             progressNumber={3}
             icon={<CheckCircle size={40} />}
           />
           <StatsCard
             title="Pending Requests"
-            statNumber={data.pendingNGORequestsCount}
+            statNumber={data?.pendingNGORequestsCount}
             progress={true}
             progressNumber={3}
             icon={<CheckCircle size={40} />}

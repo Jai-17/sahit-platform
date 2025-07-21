@@ -4,7 +4,7 @@ import { verifyJWT } from "../../middleware/auth";
 
 const router = Router();
 
-router.post('/create', createRequest);
+router.post('/create', verifyJWT, createRequest);
 router.get('/user/:id', getUserHelpRequestById);
 router.get('/ngo-accepted', verifyJWT, getRequestAcceptByNGO);
 router.patch('/accept/ngo', verifyJWT, acceptRequestNGO);

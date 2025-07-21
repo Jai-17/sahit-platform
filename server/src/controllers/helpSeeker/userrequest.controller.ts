@@ -31,7 +31,7 @@ export const getActiveHelpRequest = async (req: Request, res: Response): Promise
             where: {
                 userId: helpSeekerId,
                 status: {
-                    in: ['IN_PROGRESS']
+                    in: ['IN_PROGRESS', "SEND_TO_NGOS"]
                 }
             },
             include: { assignedNGO: true }

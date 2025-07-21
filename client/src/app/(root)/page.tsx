@@ -11,6 +11,7 @@ import {
   useGetHelpRequestCountQuery,
 } from "@/store/features/protectedApiSlice";
 import { BellIcon } from "lucide-react";
+import { redirect } from "next/navigation";
 import React from "react";
 
 const HomePage = () => {
@@ -34,7 +35,7 @@ const HomePage = () => {
               <h2 className="text-xl 2xl:text-2xl font-semibold mt-2">
                 Hey, you have 1 new notification and 2 new requests.
               </h2>
-              <Button className="bg-white text-black px-10 py-5 mt-5 cursor-pointer hover:bg-neutral-200 transition-colors ease-in-out duration-300">
+              <Button onClick={() => redirect('/new-request')} className="bg-white text-black px-10 py-5 mt-5 cursor-pointer hover:bg-neutral-200 transition-colors ease-in-out duration-300">
                 New Request
               </Button>
             </div>
@@ -68,14 +69,14 @@ const HomePage = () => {
         {isLoadingActiveRequest ? (
           <div>Loading...</div>
         ) : (
-          activeRequest?.data && (
+          activeRequest?.data ? (
             <>
               <h1 className="text-2xl font-semibold">Active Requests</h1>
               <div className="px-6">
                 <SentRequestStatus data={activeRequest.data} />
               </div>
             </>
-          )
+          ) : <div>No Active Request</div>
         )}
         {isLoadingIncomingRequest ? (
           <div>Loading...</div>

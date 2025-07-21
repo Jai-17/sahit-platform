@@ -65,18 +65,15 @@ interface HelpSeeker {
 }
 
 interface HelpRequest {
-    attachments: string[];
-    description: string;
-    helpType: string;
-    hideFace: boolean;
-    hideId: boolean;
-    hideName: boolean;
-    id: string;
-    ngoId: string;
-    status: string;
-    submittedAt: DateTime;
-    title: string;
-    urgency: string;
-    user: HelpSeeker;
-    userId: string
+  id: string;
+  description: string;
+  helpType: string;
+  status: string;
+  submittedAt: Date;
+  title: string;
+  urgency: string;
+  user: {
+    city: string;
+    state: string;
+  };
 }

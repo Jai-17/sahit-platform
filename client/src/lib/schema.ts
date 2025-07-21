@@ -17,3 +17,14 @@ export const onboardingSchema = z.object({
     photo: z.string().url("Photo must be a valid URL"),
     idProofs: z.string().url("ID Proofs must be valid URLs")
 })
+
+export const requestFormSchema = z.object({
+    helpType: z.enum(["LEGAL", "SHELTER", "COUNSELLING", "FINANCIAL", "OTHER"]),
+    title: z.string().min(10, "Title is required, min 10 characters"),
+    description: z.string().min(20, "Description is required, minimum 20 characters"),
+    attachments: z.array(z.string().url('Each document must be a valid url')).max(5, "You can only upload 5 documents"),
+    urgency: z.enum(["HIGH", "URGENT", "MEDIUM", "LOW"]),
+    hideId: z.boolean(),
+    hideFace: z.boolean(),
+    hideName: z.boolean()
+})

@@ -1,5 +1,8 @@
+"use client"
+
 import HistoryRequestStatus from "@/components/support-db/HistoryRequestStatus";
 import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
 import React from "react";
 
 const HistoryPage = () => {
@@ -14,7 +17,7 @@ const HistoryPage = () => {
             Check out your incoming requests and choose them from here
           </p>
         </div>
-        <Button className="bg-[#8300EA] px-9 py-5 hover:bg-[#8300EA90] cursor-pointer">New Request</Button>
+        <Button onClick={() => redirect('/new-request')} className="bg-[#8300EA] px-9 py-5 hover:bg-[#8300EA90] cursor-pointer">New Request</Button>
       </div>
       <div>
         <HistoryRequestStatus />

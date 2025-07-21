@@ -190,9 +190,11 @@ const Page = () => {
       <div className="mt-5 flex flex-col gap-5">
         <InfoCard heading={data.data.title}>{data.data.description}</InfoCard>
         <InfoCard heading="Attachments">
-          {data.data.attachments.length == 0
+          <div className="flex flex-col gap-4">
+            {data.data.attachments.length == 0
             ? "No attachments found"
-            : data.data.attachments}
+            : (data.data.attachments.map((url:string) => <Image src={url} key={url} alt={url} height={300} width={300} />))}
+          </div>
         </InfoCard>
       </div>
       <p className="mt-10 text-neutral-500">

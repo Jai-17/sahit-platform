@@ -8,7 +8,7 @@ export const createRequest = async (
 ): Promise<void> => {
   // Made by a verified user with access token
   // const userId = req.body.userId
-  const userId = "9af9c5f5-ea2a-42e9-80d3-d55c3c90f8de";
+  const userId = req.user.roleId
 
   // HELP TYPE, URGENCY, STATUS ARE ENUMS
   const {
@@ -22,6 +22,8 @@ export const createRequest = async (
     urgency,
   } = req.body;
 
+  console.log('REQ BODY', req.body);
+
   try {
     const helpSeeker = await prisma.helpSeeker.findUnique({
       where: { id: userId },
@@ -32,6 +34,10 @@ export const createRequest = async (
         .json({ success: false, message: "Help Seeker with the ID not found" });
       return;
     }
+
+    console.log('HELP SEEKER', helpSeeker);
+
+    console.log('BEFORE ALREADY EXISTING REQUEST');
 
     const alreadyExistingRequest = await prisma.helpRequest.findFirst({
       where: {
@@ -61,6 +67,18 @@ export const createRequest = async (
       return;
     }
 
+    console.log('HELP REQUEST BEFORE',{
+        userId,
+        helpType,
+        title,
+        description,
+        attachments,
+        hideId,
+        hideFace,
+        hideName,
+        urgency,
+      },);
+
     const helpRequest = await prisma.helpRequest.create({
       data: {
         userId,
@@ -74,6 +92,8 @@ export const createRequest = async (
         urgency,
       },
     });
+
+    console.log('HELP REQUEST', helpRequest);
 
     // await pushHelpRequests(helpRequest.id);
     await queue.add(

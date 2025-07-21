@@ -32,8 +32,16 @@ export const protectedApiSlice = createApi({
     
     getHelpRequestCount: builder.query({
       query: () => '/api/v1/help/request/count-requests'
+    }),
+
+    createHelpRequest: builder.mutation({
+      query: (userData) => ({
+        url: '/api/v1/request/create',
+        method: 'POST',
+        body: userData,
+      })
     })
   }),
 });
 
-export const { useHelpSeekerRegisterMutation, useGetUserQuery, useGetAcceptedRequestByNGOQuery, useGetRequestHistoryQuery, useGetActiveHelpRequestQuery, useGetHelpRequestCountQuery } = protectedApiSlice;
+export const { useHelpSeekerRegisterMutation, useGetUserQuery, useGetAcceptedRequestByNGOQuery, useGetRequestHistoryQuery, useGetActiveHelpRequestQuery, useGetHelpRequestCountQuery, useCreateHelpRequestMutation } = protectedApiSlice;

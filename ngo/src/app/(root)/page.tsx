@@ -8,7 +8,8 @@ import { BellIcon, CheckCircle, PlusCircle } from "lucide-react";
 import React from "react";
 
 const Page = () => {
-  const {data} = useGetDBStatsQuery(undefined);
+  const {data, isLoading} = useGetDBStatsQuery(undefined);
+  if(isLoading) return <div>Loading...</div>
 
   return (
     <div>
@@ -16,7 +17,7 @@ const Page = () => {
         <div className="flex-1">
           <StatsCard
             title="Active Request"
-            statNumber={data.activeRequests}
+            statNumber={data?.activeRequests}
             progress={true}
             progressNumber={3}
             icon={<BellIcon size={40} />}
@@ -25,7 +26,7 @@ const Page = () => {
         <div className="flex-1">
           <StatsCard
             title="New Request"
-            statNumber={data.newRequests}
+            statNumber={data?.newRequests}
             progress={true}
             progressNumber={3}
             icon={<CheckCircle size={40} />}
@@ -34,7 +35,7 @@ const Page = () => {
         <div className="flex-1">
           <StatsCard
             title="Total Helped"
-            statNumber={data.totalHelped}
+            statNumber={data?.totalHelped}
             progress={true}
             progressNumber={3}
             icon={<PlusCircle size={40} />}
