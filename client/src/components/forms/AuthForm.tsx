@@ -20,6 +20,8 @@ import { jwtDecode } from "jwt-decode";
 import GoogleLoginButton from "../ui/googleLogin";
 import { store } from "@/store/store";
 import { useAuth } from "@/lib/hooks/useAuth";
+import { useCreateChatTokenMutation } from "@/store/features/protectedApiSlice";
+import { setSupabaseAuthToken } from "@/lib/chat";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -43,6 +45,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const router = useRouter();
   const isSignIn = type === "sign-in";
   const [signUp, { isLoading }] = useSignUpMutation();
+  const [createChatToken] = useCreateChatTokenMutation();
   const formSchema = authFormSchema(type);
   type AuthFormData = z.infer<ReturnType<typeof authFormSchema>>;
   const [signIn] = useSignInMutation();
@@ -85,6 +88,22 @@ const AuthForm = ({ type }: { type: FormType }) => {
         dispatch(setUser(decode));
         console.log("Auth from Redux:", store.getState().auth);
         toast.success("Signed in Successfully");
+        const currentUserId = decode.userId;
+        if (currentUserId) {
+        try {
+          const supabaseTokenData = await createChatToken(currentUserId).unwrap();
+          console.log('⭐⭐⭐ SUPABASE TOKEN DATA IS WHAT',supabaseTokenData);
+          const supabaseJwt = supabaseTokenData.supabase_jwt;
+          console.log(supabaseJwt);
+          setSupabaseAuthToken(supabaseJwt);
+          console.log('Supabase JWT successfully set on client.');
+        } catch (tokenError) {
+          console.error('Error Supabase JWT via RTK Query:', tokenError);
+        }
+      } else {
+        console.warn('User ID not found');
+      }
+
         if (user.isOnboarded) {
           console.log('ISONBOARDED', user.isOnboarded);
           router.push("/onboarding/verify");

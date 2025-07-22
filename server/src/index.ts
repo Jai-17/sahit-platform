@@ -18,6 +18,9 @@ import userNGORoutes from './routes/ngo/user.routes';
 import authNGORoutes from './routes/ngo/auth.routes';
 import requestNGORoutes from './routes/ngo/ngorequest.route';
 
+/* ROUTE IMPORTS CHAT */
+import chatRoutes from './routes/chat/chat.routes';
+
 const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
 
 dotenv.config();
@@ -38,6 +41,9 @@ app.use(cors({credentials: true, origin: (origin, callback) => {
 app.get("/", (req, res) => {
     res.json({message: "Server is running!"});
 })
+
+// Chat Routes
+app.use('/api/v1/chat', chatRoutes);
 
 // Help Seeker Routes
 app.use('/api/v1/help/auth', authRoutes);
