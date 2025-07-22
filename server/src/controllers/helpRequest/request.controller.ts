@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../../db";
 import { queue } from "../../utils/worker";
+import redis from "../../utils/redis";
 
 export const createRequest = async (
   req: Request,
@@ -8,7 +9,10 @@ export const createRequest = async (
 ): Promise<void> => {
   // Made by a verified user with access token
   // const userId = req.body.userId
-  const userId = req.user.roleId
+  const userId = req.user.roleId;
+  const actualUserId = req.user?.userId;
+  const cacheKey = `cache:allHelpRequests-${userId}`;
+  const cacheKeyAcceptedNGO = `cache:requestAcceptedByNGOForUser-${actualUserId}`;
 
   // HELP TYPE, URGENCY, STATUS ARE ENUMS
   const {
@@ -22,7 +26,7 @@ export const createRequest = async (
     urgency,
   } = req.body;
 
-  console.log('REQ BODY', req.body);
+  console.log("REQ BODY", req.body);
 
   try {
     const helpSeeker = await prisma.helpSeeker.findUnique({
@@ -35,19 +39,23 @@ export const createRequest = async (
       return;
     }
 
-    console.log('HELP SEEKER', helpSeeker);
+    console.log("HELP SEEKER", helpSeeker);
 
-    console.log('BEFORE ALREADY EXISTING REQUEST');
+    console.log("BEFORE ALREADY EXISTING REQUEST");
 
     const alreadyExistingRequest = await prisma.helpRequest.findFirst({
       where: {
         userId,
-        status: {in: ["ACCEPTED_BY_NGO", "IN_PROGRESS", "SEND_TO_NGOS", "PENDING"]},
-      }
-    })
+        status: {
+          in: ["ACCEPTED_BY_NGO", "IN_PROGRESS", "SEND_TO_NGOS", "PENDING"],
+        },
+      },
+    });
 
-    if(alreadyExistingRequest) {
-      res.status(501).json({success: false, message: "A request already exists"});
+    if (alreadyExistingRequest) {
+      res
+        .status(501)
+        .json({ success: false, message: "A request already exists" });
       return;
     }
 
@@ -67,17 +75,17 @@ export const createRequest = async (
       return;
     }
 
-    console.log('HELP REQUEST BEFORE',{
-        userId,
-        helpType,
-        title,
-        description,
-        attachments,
-        hideId,
-        hideFace,
-        hideName,
-        urgency,
-      },);
+    console.log("HELP REQUEST BEFORE", {
+      userId,
+      helpType,
+      title,
+      description,
+      attachments,
+      hideId,
+      hideFace,
+      hideName,
+      urgency,
+    });
 
     const helpRequest = await prisma.helpRequest.create({
       data: {
@@ -93,7 +101,7 @@ export const createRequest = async (
       },
     });
 
-    console.log('HELP REQUEST', helpRequest);
+    console.log("HELP REQUEST", helpRequest);
 
     // await pushHelpRequests(helpRequest.id);
     await queue.add(
@@ -104,6 +112,8 @@ export const createRequest = async (
         removeOnFail: { age: 86400 },
       }
     );
+    await redis.del(cacheKey);
+    await redis.del(cacheKeyAcceptedNGO);
 
     res.status(200).json({
       success: true,
@@ -134,66 +144,92 @@ export const getUserHelpRequestById = async (
       return;
     }
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Help Request Found",
-        data: helpRequest,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Help Request Found",
+      data: helpRequest,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
-export const acceptRequestNGO = async (req: Request, res: Response): Promise<void> => {
-  const userId = req.user?.userId
-  console.log('COMING FROM CONTROLLER USER ID', userId);
+export const acceptRequestNGO = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const userId = req.user?.userId;
+  console.log("COMING FROM CONTROLLER USER ID", userId);
   const requestId = req.body.requestId;
 
   try {
-    const roleId = await prisma.nGO.findUnique({where: {userId}, select: {id: true}})
-  
+    const roleId = await prisma.nGO.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
     const updatedRequest = await prisma.helpRequestNGOStatus.update({
       where: {
         helpRequestId_ngoId: {
           helpRequestId: requestId,
-          ngoId: roleId?.id!
-        }
+          ngoId: roleId?.id!,
+        },
       },
       data: {
         status: "ACCEPTED",
-      }
+      },
     });
 
-    if(!updatedRequest) {
-      res.status(404).json({success: false, message: "No help request exists"});
+    if (!updatedRequest) {
+      res
+        .status(404)
+        .json({ success: false, message: "No help request exists" });
       return;
     }
 
-    res.status(200).json({ success: true, message: "Request accepted by NGO", data: updatedRequest });
+    res.status(200).json({
+      success: true,
+      message: "Request accepted by NGO",
+      data: updatedRequest,
+    });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({success: false, message: "Internal Server Error"});
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
-}
+};
 
 export const getRequestAcceptByNGO = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const userId = req.user?.userId;
+  const cacheKey = `cache:requestAcceptedByNGOForUser-${userId}`;
+
   try {
-    const helpRequests = await prisma.helpSeeker.findMany({where: {userId}, select: { helpRequests: {select: {id: true}} }})
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log("Returning from cache");
+      res.json({
+        success: true,
+        message: "Found Accepted Help Request from REDIS",
+        data: JSON.parse(cached),
+      });
+      return;
+    }
+
+    const helpRequests = await prisma.helpSeeker.findMany({
+      where: { userId },
+      select: { helpRequests: { select: { id: true } } },
+    });
     const helpRequestIds = helpRequests.flatMap((hs) =>
-  hs.helpRequests.map((req) => req.id)
-);
+      hs.helpRequests.map((req) => req.id)
+    );
     console.log(helpRequestIds);
     const acceptedByNGOs = await prisma.helpRequestNGOStatus.findMany({
       where: {
         helpRequestId: {
-          in: helpRequestIds
+          in: helpRequestIds,
         },
         status: "ACCEPTED",
       },
@@ -202,53 +238,77 @@ export const getRequestAcceptByNGO = async (
       },
     });
 
-    if(!acceptedByNGOs) {
-      res.status(404).json({success: false, message: "Data is missing or invalid"});
+    if (!acceptedByNGOs) {
+      res
+        .status(404)
+        .json({ success: false, message: "Data is missing or invalid" });
       return;
     }
 
-    res.status(200).json({success: true, message: "Found NGOS", data: acceptedByNGOs});
+    await redis.set(cacheKey, JSON.stringify(acceptedByNGOs), "EX", 1200);
+
+    res
+      .status(200)
+      .json({ success: true, message: "Found NGOS", data: acceptedByNGOs });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
-export const acceptRequestUser = async (req: Request, res: Response): Promise<void> => {
+export const acceptRequestUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const ngoId = req.body.ngoId;
   const helpRequestId = req.body.requestId;
 
   try {
     // 1. Assign the ngo to HelpRequestTable and update status
     await prisma.helpRequest.update({
-      where: {id: helpRequestId},
+      where: { id: helpRequestId },
       data: {
         assignedNGO: {
-          connect: {id: ngoId},
+          connect: { id: ngoId },
         },
         status: "IN_PROGRESS",
         requestedNGOs: {
-          set: [{id: ngoId}],
-        }
-      }
-    })
+          set: [{ id: ngoId }],
+        },
+      },
+    });
 
     // 2. Delete other ngo status
     await prisma.helpRequestNGOStatus.deleteMany({
       where: {
         helpRequestId,
-      }
-    })
+      },
+    });
 
-    res.status(200).json({success: true, message: "Help Request Successfully assigned to NGO"})
+    res.status(200).json({
+      success: true,
+      message: "Help Request Successfully assigned to NGO",
+    });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({success: false, message: "Internal Server Error"});
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
-}
+};
 
-export const getAdminStats = async (req: Request, res: Response):Promise<void> => {
-    try {
+export const getAdminStats = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const cacheKey = "cache:adminStats";
+
+  try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log("Returning from cache");
+      res.json(JSON.parse(cached));
+      return;
+    }
+
     const [
       activeNGOsCount,
       activeRequestsCount,
@@ -312,6 +372,22 @@ export const getAdminStats = async (req: Request, res: Response):Promise<void> =
       }),
     ]);
 
+    await redis.set(
+      cacheKey,
+      JSON.stringify({
+        activeNGOsCount,
+        activeRequestsCount,
+        totalHelpedCount,
+        inactiveNGOsCount,
+        totalHelpSeekersCount,
+        ongoingRequestsCount,
+        totalRequestsCount,
+        pendingNGORequestsCount,
+      }),
+      "EX",
+      1200
+    );
+
     res.status(200).json({
       activeNGOsCount,
       activeRequestsCount,
@@ -326,4 +402,4 @@ export const getAdminStats = async (req: Request, res: Response):Promise<void> =
     console.error("Failed to fetch admin stats:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};

@@ -3,12 +3,13 @@
 import React from "react";
 import { useGetAllNGOsQuery } from "@/store/features/apiSlice";
 import NGOTableCard from "./NGOTableCard";
+import TableLoader from "./loaders/TableLoader";
 
 const NGOTable = ({ searchTerm }: { searchTerm: string }) => {
   const { data, isLoading } = useGetAllNGOsQuery(undefined);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <TableLoader />
   }
 
   console.log(data?.data[0]);

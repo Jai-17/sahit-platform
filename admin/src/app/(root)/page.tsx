@@ -1,5 +1,6 @@
 "use client"
 
+import HomeLoader from "@/components/loaders/HomeLoader";
 import StatsCard from "@/components/StatsCard";
 import { useGetDBStatsQuery } from "@/store/features/apiSlice";
 import { CheckCircle } from "lucide-react";
@@ -8,7 +9,7 @@ import React from "react";
 const HomePage = () => {
   const {data, isLoading} = useGetDBStatsQuery(undefined);
 
-  if(isLoading) return <div>Loading...</div>
+  if(isLoading) return <HomeLoader />
 
   console.log(data);
   return (

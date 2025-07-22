@@ -120,13 +120,11 @@ export const registerNGO = async (
       data: { isOnboarded: true },
     });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "NGO Registered Successfully",
-        data: ngo,
-      });
+    res.status(200).json({
+      success: true,
+      message: "NGO Registered Successfully",
+      data: ngo,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -205,7 +203,16 @@ export const ngoDashboardStat = async (
   res: Response
 ): Promise<void> => {
   const ngoId = req.user.roleId;
+  const cacheKey = `cache:ngoStatFor-${ngoId}`;
+
   try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log("Returning from cache");
+      res.json(JSON.parse(cached));
+      return;
+    }
+
     const activeRequests = await prisma.helpRequest.count({
       where: {
         ngoId: ngoId as string,
@@ -225,6 +232,8 @@ export const ngoDashboardStat = async (
         status: "RESOLVED",
       },
     });
+
+    await redis.set(cacheKey, JSON.stringify({activeRequests, newRequests, totalHelped}), "EX", 1200);
 
     res.json({
       activeRequests,

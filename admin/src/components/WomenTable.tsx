@@ -3,12 +3,13 @@
 import React from "react";
 import WomenTableCard from "./WomenTableCard";
 import { useGetAllHelpSeekerQuery } from "@/store/features/apiSlice";
+import TableLoader from "./loaders/TableLoader";
 
 const WomenTable = ({ searchTerm }: { searchTerm: string }) => {
   const { data, isLoading } = useGetAllHelpSeekerQuery(undefined);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <TableLoader />
   }
 
   console.log(data?.data[0]);

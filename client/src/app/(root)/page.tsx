@@ -5,6 +5,7 @@ import StatsCard from "@/components/common/StatsCard";
 import IncomingRequestCard from "@/components/support-db/IncomingRequestCard";
 import SentRequestStatus from "@/components/support-db/SentRequestStatus";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   useGetAcceptedRequestByNGOQuery,
   useGetActiveHelpRequestQuery,
@@ -19,10 +20,7 @@ const HomePage = () => {
     useGetAcceptedRequestByNGOQuery(undefined);
   const { data: activeRequest, isLoading: isLoadingActiveRequest } =
     useGetActiveHelpRequestQuery(undefined);
-  const {data: countRequest} = useGetHelpRequestCountQuery(undefined);
-  console.log("INCOMING REQUEST", incomingRequest);
-  console.log("ACTIVE REQUEST", activeRequest);
-  console.log("COUNT", countRequest)
+  const {data: countRequest, isLoading: countLoading} = useGetHelpRequestCountQuery(undefined);
 
   return (
     <>
@@ -43,7 +41,7 @@ const HomePage = () => {
         </div>
 
         <div className="h-full">
-          <StatsCard title="Total Requests" statNumber={countRequest?.data.count} progress={true} progressNumber={3} icon={<BellIcon size={40} />}  />
+         <StatsCard title="Total Requests" statNumber={countLoading ? "..." : countRequest?.data.count} progress={true} progressNumber={3} icon={<BellIcon size={40} />}  />
         </div>
       </div>
 
@@ -66,9 +64,7 @@ const HomePage = () => {
       </p>
 
       <div className="bg-white mt-5 p-5 rounded-lg">
-        {isLoadingActiveRequest ? (
-          <div>Loading...</div>
-        ) : (
+        {(isLoadingActiveRequest ? <div><Skeleton className="h-20" /></div> : 
           activeRequest?.data ? (
             <>
               <h1 className="text-2xl font-semibold">Active Requests</h1>
@@ -78,9 +74,7 @@ const HomePage = () => {
             </>
           ) : <div>No Active Request</div>
         )}
-        {isLoadingIncomingRequest ? (
-          <div>Loading...</div>
-        ) : (
+        {(isLoadingIncomingRequest ? <div><Skeleton className="mt-10 h-20" /></div> :
           incomingRequest?.data.length > 0 && (
             <>
               <h1 className="text-2xl font-semibold">Incoming Requests</h1>(

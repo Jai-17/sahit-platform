@@ -1,6 +1,7 @@
 "use client"
 
 import StatsCard from "@/components/common/StatsCard";
+import HomeLoader from "@/components/loaders/HomeLoader";
 import ActiveRequestStatus from "@/components/ngo-db/ActiveRequestStatus";
 // import IncomingRequestCard from "@/components/ngo-db/IncomingRequestCard";
 import { useGetDBStatsQuery } from "@/store/features/protectedApiSlice";
@@ -9,7 +10,7 @@ import React from "react";
 
 const Page = () => {
   const {data, isLoading} = useGetDBStatsQuery(undefined);
-  if(isLoading) return <div>Loading...</div>
+  if(isLoading) return <HomeLoader />
 
   return (
     <div>

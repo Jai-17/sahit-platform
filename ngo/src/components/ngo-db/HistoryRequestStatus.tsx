@@ -2,12 +2,13 @@
 import React from "react";
 import SentRequestTableCard from "./SentRequestTableCard";
 import { useGetAllHelpRequestQuery } from "@/store/features/protectedApiSlice";
+import HistoryLoader from "../loaders/HistoryLoader";
 
 const HistoryRequestStatus = () => {
   const {data, isLoading} = useGetAllHelpRequestQuery(undefined);
   console.log(data);
 
-  if(isLoading) return <div>Loading...</div>
+  if(isLoading) return <HistoryLoader />
 
   return (
     <div>

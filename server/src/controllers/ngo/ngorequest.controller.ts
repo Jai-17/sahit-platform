@@ -1,13 +1,27 @@
 import { Request, Response } from "express";
 import { prisma } from "../../db";
+import redis from "../../utils/redis";
 
 export const getIncomingHelpRequests = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const userId = req.user?.roleId;
+  const cacheKey = `cache:incomingRequests-${userId}`
   console.log("Coming from here", userId);
   try {
+    const cached = await redis.get(cacheKey);
+    
+    if (cached) {
+      console.log("Returning from cache");
+      res.json({
+        success: true,
+        message: "Found Incoming Request from REDIS",
+        data: JSON.parse(cached),
+      });
+      return;
+    }
+
     const helpRequests = (
       await prisma.helpRequestNGOStatus.findMany({
         where: {
@@ -40,6 +54,8 @@ export const getIncomingHelpRequests = async (
       return;
     }
 
+    await redis.set(cacheKey, JSON.stringify(helpRequests), "EX", 300);
+
     res.status(200).json({
       success: true,
       message: "Incoming Requests",
@@ -56,8 +72,20 @@ export const getAllHelpRequest = async (
   res: Response
 ): Promise<void> => {
   const ngoId = req.user.roleId;
+  const cacheKey = `cache:allHelpRequestForNGO-${ngoId}`
 
   try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log("Returning from cache");
+      res.json({
+        success: true,
+        message: "Found Help Request from REDIS",
+        data: JSON.parse(cached),
+      });
+      return;
+    }
+
     const helpRequests = await prisma.helpRequest.findMany({
       where: { ngoId: ngoId },
       include: { user: true },
@@ -69,6 +97,9 @@ export const getAllHelpRequest = async (
         .json({ success: false, message: "No help requests found" });
       return;
     }
+
+    await redis.set(cacheKey, JSON.stringify(helpRequests), "EX", 1200);
+
 
     res
       .status(200)
