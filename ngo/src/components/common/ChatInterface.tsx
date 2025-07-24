@@ -203,7 +203,7 @@ const ChatInterface = ({
                   msg.sender_id === sender
                     ? "bg-violet-600 text-white rounded-br-none"
                     : "bg-gray-200 text-gray-800 rounded-bl-none"
-                } rounded-lg px-4 py-2 max-w-[70%] shadow-sm`}
+                } rounded-lg px-4 py-2 max-w-[70%] shadow-sm break-words`}
               >
                 <p>{msg.content}</p>
                 <span className="block text-xs mt-1 opacity-75">

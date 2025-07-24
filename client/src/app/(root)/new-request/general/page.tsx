@@ -21,7 +21,7 @@ const Page = () => {
           Check and verify your profile information, you can edit it from the
           profile page
         </p>
-        <div className="grid grid-cols-4 gap-5 bg-neutral-50 p-5 rounded-md mt-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 bg-neutral-50 p-5 rounded-md mt-5">
             <p><span className="font-semibold">Name: </span>{data?.data?.name}</p>
             <p><span className="font-semibold">Occupation: </span>{data?.data?.occupation}</p>
             <p><span className="font-semibold">Address: </span>{data?.data?.address}</p>
@@ -39,7 +39,7 @@ const Page = () => {
             <Image src={data?.data?.idProofs} alt="id proof" width={300} height={300} className="border-2 rounded-lg border-neutral-400" />
         </div>
       </div>
-      <div className="flex my-5 justify-between px-32">
+      <div className="flex my-5 justify-between lg:px-32">
         <Button
           onClick={() => redirect("/new-request")}
           className="bg-neutral-400 flex !px-7 py-5 hover:bg-neutral-300 cursor-pointer"

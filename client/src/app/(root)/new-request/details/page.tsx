@@ -229,7 +229,7 @@ const Page = () => {
               )}
             </div>
 
-            <div className="flex my-5 justify-between px-32">
+            <div className="flex my-5 justify-between lg:px-32">
               <Button
                 onClick={() => redirect("/new-request/general")}
                 className="bg-neutral-400 flex !px-7 py-5 hover:bg-neutral-300 cursor-pointer"

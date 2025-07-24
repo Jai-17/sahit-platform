@@ -38,7 +38,7 @@ const Page = () => {
           Give your request a final review before submitting.
         </p>
         <h1 className="mt-5 font-semibold text-xl">Details</h1>
-        <div className="mt-2 grid grid-cols-2 gap-5 bg-neutral-50 p-10 rounded-lg border-dashed border-neutral-300 border-2">
+        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 break-words gap-5 bg-neutral-50 p-10 rounded-lg border-dashed border-neutral-300 border-2">
           <p>
             <span className="font-semibold">Request Title: </span>
             {data?.title}
@@ -105,7 +105,7 @@ const Page = () => {
           </p>
         </div>
       </div>
-      <div className="flex my-5 justify-between px-32">
+      <div className="flex my-5 justify-between lg:px-32">
         <Button
           onClick={() => redirect("/new-request/disclosures")}
           className="bg-neutral-400 flex !px-7 py-5 hover:bg-neutral-300 cursor-pointer"

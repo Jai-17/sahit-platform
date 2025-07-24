@@ -16,12 +16,12 @@ const RequestFormStatusHeader = () => {
     const pathname = usePathname();
 
   return (
-    <div className='flex gap-10'>
+    <div className='flex lg:gap-10'>
       {headerItems.map((item) => {
         const isActive = item.path === pathname;
 
         return (
-            <div className={cn('border-2 text-lg px-6 py-4 rounded-lg', isActive ? 'bg-[#8300EA] text-white border-[#8300EA]' : 'text-neutral-500 border-neutral-200')} key={item.label}>
+            <div className={cn('border-2 text-xs md:text-lg px-2 py-2 md:px-6 md:py-4 rounded-lg', isActive ? 'bg-[#8300EA] text-white border-[#8300EA]' : 'text-neutral-500 border-neutral-200')} key={item.label}>
                 {item.label}
             </div>
         )

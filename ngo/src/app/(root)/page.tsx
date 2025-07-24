@@ -14,7 +14,7 @@ const Page = () => {
 
   return (
     <div>
-      <div className="flex w-full justify-between gap-6 px-10">
+      <div className="flex flex-col lg:flex-row w-full justify-between gap-6 lg:px-10">
         <div className="flex-1">
           <StatsCard
             title="Active Request"

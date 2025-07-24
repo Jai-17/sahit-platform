@@ -113,7 +113,7 @@ const Page = () => {
               )}
             />
             </div>
-            <div className="flex mt-60 justify-between px-32">
+            <div className="flex mt-60 justify-between lg:px-32">
               <Button
                 type="button"
                 onClick={() => router.push("/new-request/details")}

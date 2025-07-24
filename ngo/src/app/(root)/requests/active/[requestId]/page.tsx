@@ -50,7 +50,7 @@ const Page = () => {
         {/* MODALS PAGES */}
         <div className="flex gap-5 mt-5 md:mt-0">
           <Sheet>
-            <SheetTrigger className="h-10 px-7 border border-neutral-400 text-neutral-600 rounded-md transition duration-200 ease-in cursor-pointer">
+            <SheetTrigger className="h-10 px-7 text-xs md:text-base border border-neutral-400 text-neutral-600 rounded-md transition duration-200 ease-in cursor-pointer">
               View User Details
             </SheetTrigger>
             <SheetContent>
@@ -58,7 +58,9 @@ const Page = () => {
                 <SheetTitle className="text-xl text-[#8300EA] font-semibold">
                   User Details
                 </SheetTitle>
-                <SheetDescription>Details about the Help Seeker</SheetDescription>
+                <SheetDescription>
+                  Details about the Help Seeker
+                </SheetDescription>
               </SheetHeader>
               <div className="px-5">
                 <span className="text-2xl mb-3 text-black font-semibold">
@@ -67,20 +69,11 @@ const Page = () => {
                 <div className="mt-3 flex flex-col gap-2">
                   <InfoTab title="City" value={data.data.user.city} />
                   <InfoTab title="State" value={data.data.user.state} />
-                  <InfoTab
-                    title="Address"
-                    value={data.data.user.address}
-                  />
-                  <InfoTab
-                    title="Age"
-                    value={`${data.data.user.age}`}
-                  />
+                  <InfoTab title="Address" value={data.data.user.address} />
+                  <InfoTab title="Age" value={`${data.data.user.age}`} />
                   <InfoTab
                     title="Registered On"
-                    value={format(
-                      new Date(data.data.user.createdAt),
-                      "PPP"
-                    )}
+                    value={format(new Date(data.data.user.createdAt), "PPP")}
                   />
                   <InfoTab
                     title="Occupation"
@@ -96,7 +89,18 @@ const Page = () => {
                   />
                 </div>
                 <div className="flex flex-row gap-2 mt-4">
-                  {data.data.hideId ? "" : <InfoCard heading="ID Proof"><Image src={data.data.user.idProofs} alt="Image" height={200} width={200} /></InfoCard>}
+                  {data.data.hideId ? (
+                    ""
+                  ) : (
+                    <InfoCard heading="ID Proof">
+                      <Image
+                        src={data.data.user.idProofs}
+                        alt="Image"
+                        height={200}
+                        width={200}
+                      />
+                    </InfoCard>
+                  )}
                 </div>
               </div>
               <SheetFooter>
@@ -107,7 +111,7 @@ const Page = () => {
             </SheetContent>
           </Sheet>
           <Sheet>
-            <SheetTrigger className="h-10 px-7 border border-neutral-400 text-neutral-600 rounded-md transition duration-200 ease-in cursor-pointer">
+            <SheetTrigger className="h-10 px-7 text-xs md:text-base border border-neutral-400 text-neutral-600 rounded-md transition duration-200 ease-in cursor-pointer">
               View Request
             </SheetTrigger>
             <SheetContent>
@@ -194,7 +198,7 @@ const Page = () => {
         </div>
       </div>
 
-      <div className="mt-5 flex gap-2 md:hidden">
+      <div className="mt-5 flex flex-col gap-2 md:hidden">
         <InfoTab title="Category" value={data.data.helpType} />
         <InfoTab title="Contact">
           <div className="ml-2 flex items-center gap-7">
@@ -242,6 +246,44 @@ const Page = () => {
           </div>
         </InfoTab>
       </div>
+      <div className="p-4 space-y-4 bg-white mt-10 rounded-md shadow-lg lg:hidden">
+          <div className="border rounded-lg p-4">
+            <p className="font-semibold">
+              {data.data.user.name}
+              <span className="text-green-500 ml-1">●</span>
+            </p>
+          </div>
+
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center space-x-3">
+              <div>
+                <p className="font-semibold">
+                  {data.data.assignedNGO.representativeName}
+                  <span className="text-green-500 ml-1">●</span>
+                </p>
+                <p className="text-muted-foreground">
+                  {data.data.assignedNGO.representativeTitle}
+                </p>
+                <p className="text-muted-foreground">
+                  Typically Available{" "}
+                  {data.data.assignedNGO.representativeAvailability}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border rounded-lg p-4">
+            <p className="font-semibold mb-2">Your Request Summary</p>
+            <p className="text-muted-foreground">{data.data.description}</p>
+          </div>
+
+          <div className="border rounded-lg p-4">
+            <p className="font-semibold mb-2">Brief About NGO</p>
+            <p className="text-muted-foreground">
+              {data.data.assignedNGO.about}
+            </p>
+          </div>
+        </div>
       <div className="mt-7 bg-white rounded-lg shadow-lg/5 h-[calc(100vh-330px)]">
         <ResizablePanelGroup direction="horizontal">
           {/* LEFT PANEL */}
@@ -249,7 +291,7 @@ const Page = () => {
             defaultSize={45}
             minSize={30}
             maxSize={60}
-            className="p-4 space-y-4"
+            className="p-4 space-y-4 hidden lg:inline"
           >
             <div className="border rounded-lg p-4">
               <p className="font-semibold">
@@ -292,13 +334,14 @@ const Page = () => {
           <ResizableHandle withHandle />
 
           {/* RIGHT PANEL */}
-          <ResizablePanel
-            defaultSize={55}
-            minSize={40}
-          >
-            <ChatInterface sender={auth.userId!} reciever={data?.data.user.userId} />
+          <ResizablePanel defaultSize={55} minSize={40}>
+            <ChatInterface
+              sender={auth.userId!}
+              reciever={data?.data.user.userId}
+            />
           </ResizablePanel>
         </ResizablePanelGroup>
+        <div className="h-[40px] lg:hidden"></div>
       </div>
     </div>
   );
