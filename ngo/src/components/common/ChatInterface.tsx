@@ -11,7 +11,7 @@ import {
   useStartChatMutation,
 } from "@/store/features/protectedApiSlice";
 import { Input } from "../ui/input";
-import { format } from "date-fns";
+import {format} from 'date-fns';
 
 type Message = {
   id: string;
@@ -20,7 +20,7 @@ type Message = {
   created_at: string;
 };
 
-const TestChat = ({
+const ChatInterface = ({
   sender,
   reciever,
 }: {
@@ -203,7 +203,7 @@ const TestChat = ({
                   msg.sender_id === sender
                     ? "bg-violet-600 text-white rounded-br-none"
                     : "bg-gray-200 text-gray-800 rounded-bl-none"
-                } rounded-lg px-4 py-2 max-w-[70%] shadow-sm break-words`}
+                } rounded-lg px-4 py-2 max-w-[70%] shadow-sm`}
               >
                 <p>{msg.content}</p>
                 <span className="block text-xs mt-1 opacity-75">
@@ -263,4 +263,4 @@ const TestChat = ({
   );
 };
 
-export default TestChat;
+export default ChatInterface;

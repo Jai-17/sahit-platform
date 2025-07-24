@@ -48,7 +48,7 @@ const Page = () => {
         {/* MODALS PAGES */}
         <div className="flex gap-5 mt-5 md:mt-0">
           <Sheet>
-            <SheetTrigger className="h-10 px-7 border border-neutral-400 text-neutral-600 rounded-md transition duration-200 ease-in cursor-pointer">
+            <SheetTrigger className="h-10 px-7 text-xs md:text-base border border-neutral-400 text-neutral-600 rounded-md transition duration-200 ease-in cursor-pointer">
               View NGO
             </SheetTrigger>
             <SheetContent>
@@ -99,7 +99,7 @@ const Page = () => {
             </SheetContent>
           </Sheet>
           <Sheet>
-            <SheetTrigger className="h-10 px-7 border border-neutral-400 text-neutral-600 rounded-md transition duration-200 ease-in cursor-pointer">
+            <SheetTrigger className="h-10 px-7 text-xs md:text-base border border-neutral-400 text-neutral-600 rounded-md transition duration-200 ease-in cursor-pointer">
               View Request
             </SheetTrigger>
             <SheetContent>
@@ -125,9 +125,9 @@ const Page = () => {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row mt-7 gap-5 md:items-center">
+      <div className="flex flex-col lg:flex-row mt-7 gap-5 lg:items-center">
         <IconName name={data?.data.assignedNGO.name} />
-        <div className="flex gap-2">
+        <div className="flex flex-col lg:flex-row gap-2">
           <StatusTab title={data.data.status} />
           <StatusTab title={data.data.urgency} color="RED" />
           <StatusTab
@@ -185,7 +185,7 @@ const Page = () => {
         </div>
       </div>
 
-      <div className="mt-5 flex gap-2 md:hidden">
+      <div className="mt-5 flex flex-col gap-2 md:hidden">
         <InfoTab title="Category" value={data.data.helpType} />
         <InfoTab title="Contact">
           <div className="ml-2 flex items-center gap-7">
@@ -240,7 +240,7 @@ const Page = () => {
             defaultSize={45}
             minSize={30}
             maxSize={60}
-            className="p-4 space-y-4"
+            className="p-4 space-y-4 hidden lg:inline"
           >
             <div className="border rounded-lg p-4">
               <div className="flex items-center space-x-3">
@@ -284,6 +284,42 @@ const Page = () => {
            <TestChat sender={auth.userId!} reciever={data?.data.assignedNGO.userId} />
           </ResizablePanel>
         </ResizablePanelGroup>
+
+        <div
+            className="p-4 space-y-4 bg-white mt-10 rounded-md shadow-lg lg:hidden"
+          >
+            <div className="border rounded-lg p-4">
+              <div className="flex items-center space-x-3">
+                <div>
+                  <p className="font-semibold">
+                    {data.data.assignedNGO.representativeName}
+                    <span className="text-green-500 ml-1">●</span>
+                  </p>
+                  <p className="text-muted-foreground">
+                    {data.data.assignedNGO.representativeTitle}
+                  </p>
+                  <p className="text-muted-foreground">
+                    Typically Available{" "}
+                    {data.data.assignedNGO.representativeAvailability}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="border rounded-lg p-4">
+              <p className="font-semibold mb-2">Your Request Summary</p>
+              <p className="text-muted-foreground">{data.data.description}</p>
+            </div>
+
+            <div className="border rounded-lg p-4">
+              <p className="font-semibold mb-2">Brief About NGO</p>
+              <p className="text-muted-foreground">
+                {data.data.assignedNGO.about}
+              </p>
+            </div>
+          </div>
+
+          <div className="h-[40px] lg:hidden"></div>
       </div>
     </div>
   );

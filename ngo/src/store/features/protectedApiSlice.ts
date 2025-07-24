@@ -35,6 +35,28 @@ export const protectedApiSlice = createApi({
 
     getDBStats: builder.query({
       query: () => '/api/v1/ngo/user/db-stat'
+    }),
+
+    startChat: builder.mutation({
+      query: (userData) => ({
+        url: '/api/v1/chat/start',
+        method: 'POST',
+        body: userData
+      })
+    }),
+
+    getMessagesByChatRoomId: builder.query({
+      query: (chatRoomId) => ({
+        url: `/api/v1/chat/messages/${chatRoomId}`
+      })
+    }),
+
+    sendMessage: builder.mutation({
+      query: (userData) => ({
+        url: '/api/v1/chat/send',
+        method: 'POST',
+        body: userData
+      })
     })
   }),
 });
@@ -45,5 +67,8 @@ export const {
   useIncomingRequestQuery,
   useAcceptIncomingRequestMutation,
   useGetAllHelpRequestQuery,
-  useGetDBStatsQuery
+  useGetDBStatsQuery,
+  useStartChatMutation,
+  useGetMessagesByChatRoomIdQuery,
+  useSendMessageMutation,
 } = protectedApiSlice;
