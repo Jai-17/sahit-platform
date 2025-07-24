@@ -88,7 +88,21 @@ export const getAllHelpRequest = async (
 
     const helpRequests = await prisma.helpRequest.findMany({
       where: { ngoId: ngoId },
-      include: { user: true },
+      select: {
+        id: true,
+        ngoId: true,
+        hideFace: true,
+        helpType: true,
+        urgency: true,
+        status: true,
+        submittedAt: true,
+        user: {
+          select: {
+            name: true,
+            alias: true
+          }
+        }
+      }
     });
 
     if (!helpRequests || helpRequests.length === 0) {
@@ -124,7 +138,44 @@ export const getHelpRequestById = async (
   try {
     const helpRequest = await prisma.helpRequest.findUnique({
       where: { id: helpRequestId },
-      include: { user: true, assignedNGO: true },
+      select: {
+        hideId: true,
+        title: true,
+        description: true,
+        hideName: true,
+        status: true,
+        urgency: true,
+        helpType: true,
+        user: {
+          select: {
+            name: true,
+            city: true,
+            state: true,
+            address: true,
+            age: true,
+            createdAt: true,
+            occupation: true,
+            jobType: true,
+            company: true,
+            idProofs: true,
+            alias: true,
+            photo: true,
+            whatsapp: true,
+            whatsappSame: true,
+            email: true,
+            contact: true,
+            userId: true
+          }
+        },
+        assignedNGO: {
+          select: {
+            representativeName: true,
+            representativeTitle: true,
+            representativeAvailability: true,
+            about: true,
+          }
+        }
+      }
     });
 
     if (!helpRequest) {

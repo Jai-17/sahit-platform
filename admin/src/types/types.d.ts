@@ -12,6 +12,9 @@ interface Women {
     name: string;
     occupation: string;
     photo: string;
+    _count: {
+        helpRequests: number;
+    }
     state: string;
     userId: string;
     whatsapp: string;
@@ -20,6 +23,7 @@ interface Women {
     user: {isAdminApproved: boolean},
     totalRequests?: number;
     createdAt?: DateTime;
+    helpRequests: HelpRequest[];
 }
 
 interface NGO {
@@ -33,6 +37,7 @@ interface NGO {
     createdAt: DateTime;
     email: string;
     whatsappSame: boolean;
+    resolvedHelpRequestCount: number;
     phone: string;
     whatsappNumber: string;
     about: string;

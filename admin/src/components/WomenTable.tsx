@@ -40,7 +40,7 @@ const WomenTable = ({ searchTerm }: { searchTerm: string }) => {
       ) : (
         <div className="flex flex-col gap-2">
           {filteredWomen.map((women: Women) => {
-            return <WomenTableCard key={women.userId} women={women} />;
+            return <WomenTableCard key={women.id} women={women} />;
           })}
         </div>
       )}

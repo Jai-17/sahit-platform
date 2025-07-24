@@ -72,8 +72,10 @@ interface HelpRequest {
   submittedAt: Date;
   title: string;
   urgency: string;
+  hideFace: boolean;
+  ngoId: string;
   user: {
-    city: string;
-    state: string;
+    name: string;
+    alias: string;
   };
 }

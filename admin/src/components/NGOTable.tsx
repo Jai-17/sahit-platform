@@ -27,9 +27,9 @@ const NGOTable = ({ searchTerm }: { searchTerm: string }) => {
       <div className="hidden lg:grid grid-cols-6 mt-10 text-neutral-600 w-full text-sm px-5 lg:px-7 border-b pb-6 mb-2">
         <p>ID</p>
         <p>Name</p>
-        <p>Help Status</p>
         <p>Location</p>
-        <p>Total Requests</p>
+        <p>Rating</p>
+        <p>Total Helped</p>
         <p>Joined On</p>
       </div>
 

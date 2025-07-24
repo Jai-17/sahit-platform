@@ -22,12 +22,31 @@ export const getAllHelpSeekers = async (
     }
 
     const data = await prisma.helpSeeker.findMany({
-      include: {
-        user: {
-          select: { isAdminApproved: true },
+      select: {
+        id: true,
+        name: true,
+        city: true,
+        createdAt: true,
+        _count: {
+          select: {
+            helpRequests: true,
+          }
         },
-      },
+        helpRequests: {
+          orderBy: { submittedAt: "desc" },
+          take: 1,
+          select: {
+            status: true,
+          },
+        },
+        user: {
+          select: {
+            isAdminApproved: true,
+          }
+        }
+      }
     });
+
     if (!data) {
       res
         .status(404)

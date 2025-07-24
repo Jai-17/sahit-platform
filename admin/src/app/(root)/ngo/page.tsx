@@ -13,10 +13,10 @@ const Page = () => {
       <div className="flex flex-col md:flex-row items-baseline justify-between">
         <div>
           <h1 className="text-2xl lg:text-3xl font-semibold mb-2">
-            Help Seekers
+            NGO
           </h1>
           <p className="text-neutral-500 text-sm lg:text-base">
-            All Support Seekers who have registed on the platform
+            All NGOs who have registed on the platform
           </p>
         </div>
         <div className="relative w-fit mt-7 md:mt-0">

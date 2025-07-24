@@ -22,27 +22,55 @@ export const getAllNgos = async (
     }
 
     const data = await prisma.nGO.findMany({
-      include: {
+      select: {
+        id: true,
+        name: true,
+        city: true,
+        rating: true,
+        createdAt: true,
         user: {
-          select: { isAdminApproved: true },
+          select: {
+            isAdminApproved: true,
+          },
         },
       },
     });
-    if (!data) {
+
+    if (!data || data.length === 0) {
       res.status(404).json({ success: false, message: "No NGOs found" });
       return;
     }
 
-    await redis.set(cacheKey, JSON.stringify(data), "EX", 300);
+    const ngosWithResolvedCount = await Promise.all(
+      data.map(async (ngo) => {
+        const resolvedCount = await prisma.helpRequest.count({
+          where: {
+            ngoId: ngo.id,
+            status: "RESOLVED",
+          },
+        });
 
-    res
-      .status(200)
-      .json({ success: true, message: "Found NGOs from DB", data: data });
+        return {
+          ...ngo,
+          resolvedHelpRequestCount: resolvedCount,
+        };
+      })
+    );
+
+    // Cache the correct data with resolved counts
+    await redis.set(cacheKey, JSON.stringify(ngosWithResolvedCount), "EX", 300);
+
+    res.status(200).json({
+      success: true,
+      message: "Found NGOs from DB",
+      data: ngosWithResolvedCount,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
 
 export const registerNGO = async (
   req: Request,
@@ -146,6 +174,7 @@ export const getNGOById = async (
         supportTypes: true,
         address: true,
         city: true,
+        about: true,
         state: true,
         rating: true,
         createdAt: true,
@@ -161,9 +190,9 @@ export const getNGOById = async (
           select: {
             isAdminApproved: true,
             name: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
     if (!ngo) {
       res.status(404).json({ success: false, message: "NGO not found" });
@@ -256,7 +285,12 @@ export const ngoDashboardStat = async (
       },
     });
 
-    await redis.set(cacheKey, JSON.stringify({activeRequests, newRequests, totalHelped}), "EX", 1200);
+    await redis.set(
+      cacheKey,
+      JSON.stringify({ activeRequests, newRequests, totalHelped }),
+      "EX",
+      1200
+    );
 
     res.json({
       activeRequests,

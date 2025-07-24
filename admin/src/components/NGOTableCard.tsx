@@ -48,7 +48,7 @@ const NGOTableCard = ({ngo}:{ngo: NGO}) => {
             <span className="lg:hidden font-semibold text-sm text-black">
               Total Helped:{" "}
             </span>
-            {ngo.totalHelped ? ngo.totalHelped : "N/A"}
+            {ngo.resolvedHelpRequestCount}
           </p>
           <p className="flex justify-between items-center">
             <span>

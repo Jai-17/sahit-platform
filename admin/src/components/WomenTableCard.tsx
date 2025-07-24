@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 
 const WomenTableCard = ({ women }: { women: Women }) => {
   const router = useRouter();
-
   return (
     <div onClick={() => router.push(`/help-seeker/${women.id}`)} className="cursor-pointer">
       <div className="relative bg-white mt-7 lg:mt-0 flex justify-between items-start shadow-lg/5 hover:shadow-lg/5 transition duration-300 border border-neutral-200 py-6 px-5 lg:px-7 rounded-lg hover:shadow-lg">
@@ -37,8 +36,8 @@ const WomenTableCard = ({ women }: { women: Women }) => {
               Help Status:{" "}
             </span>
             <StatusTab
-              title={women.helpStatus ? women.helpStatus : "Inactive"}
-              color={women.helpStatus ? "ORANGE" : "GRAY"}
+              title={women.helpRequests.length > 0 ? women.helpRequests[0].status : "Inactive"}
+              color={women.helpRequests.length > 0 ? "PRIMARY" : "GRAY"}
             />
           </div>
           <div>
@@ -51,7 +50,7 @@ const WomenTableCard = ({ women }: { women: Women }) => {
             <span className="lg:hidden font-semibold text-sm text-black">
               Total Requests:{" "}
             </span>
-            {women.totalRequests ? women.totalRequests : "N/A"}
+            {women._count.helpRequests}
           </p>
           <p className="flex justify-between items-center">
             <span>
