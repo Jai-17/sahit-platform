@@ -22,6 +22,9 @@ const HomePage = () => {
     useGetActiveHelpRequestQuery(undefined);
   const {data: countRequest, isLoading: countLoading} = useGetHelpRequestCountQuery(undefined);
 
+  console.log(activeRequest);
+  console.log(incomingRequest);
+
   return (
     <>
       {/* Top Cards Stats */}

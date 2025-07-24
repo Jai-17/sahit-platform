@@ -140,7 +140,30 @@ export const getNGOById = async (
   try {
     const ngo = await prisma.nGO.findUnique({
       where: { id: id },
-      include: { user: { select: { isAdminApproved: true, name: true } } },
+      select: {
+        name: true,
+        replyTimeMins: true,
+        supportTypes: true,
+        address: true,
+        city: true,
+        state: true,
+        rating: true,
+        createdAt: true,
+        email: true,
+        phone: true,
+        whatsappNumber: true,
+        whatsappSame: true,
+        representativeAvailability: true,
+        representativeName: true,
+        representativeTitle: true,
+        verifiedDocs: true,
+        user: {
+          select: {
+            isAdminApproved: true,
+            name: true,
+          }
+        }
+      }
     });
     if (!ngo) {
       res.status(404).json({ success: false, message: "NGO not found" });

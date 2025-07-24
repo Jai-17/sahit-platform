@@ -118,7 +118,6 @@ export const createRequest = async (
     res.status(200).json({
       success: true,
       message: "Help Request created successfully",
-      data: helpRequest,
     });
   } catch (error) {
     console.error("Error:", error);
@@ -233,9 +232,20 @@ export const getRequestAcceptByNGO = async (
         },
         status: "ACCEPTED",
       },
-      include: {
-        ngo: true,
-      },
+      select: {
+        updatedAt: true,
+        helpRequestId: true,
+        ngo: {
+          select: {
+            name: true,
+            about: true,
+            rating: true,
+            replyTimeMins: true,
+            supportTypes: true,
+            id: true
+          }
+        }
+      }
     });
 
     if (!acceptedByNGOs) {

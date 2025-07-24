@@ -29,6 +29,10 @@ export const protectedApiSlice = createApi({
       query: () => "/api/v1/help/request/active-request",
     }),
 
+    getActiveHelpRequestDetails: builder.query({
+      query: () => '/api/v1/help/request/active-request-details'
+    }),
+
     getHelpRequestCount: builder.query({
       query: () => "/api/v1/help/request/count-requests",
     }),
@@ -78,6 +82,7 @@ export const {
   useGetAcceptedRequestByNGOQuery,
   useGetRequestHistoryQuery,
   useGetActiveHelpRequestQuery,
+  useGetActiveHelpRequestDetailsQuery,
   useGetHelpRequestCountQuery,
   useCreateHelpRequestMutation,
   useCreateChatTokenMutation,

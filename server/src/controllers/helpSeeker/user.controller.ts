@@ -16,7 +16,7 @@ export const getAllHelpSeekers = async (
       res.json({
         success: true,
         message: "Found help seekers from REDIS",
-        data: JSON.parse(cached)
+        data: JSON.parse(cached),
       });
       return;
     }
@@ -35,15 +35,13 @@ export const getAllHelpSeekers = async (
       return;
     }
 
-    await redis.set(cacheKey, JSON.stringify(data), 'EX', 300);
+    await redis.set(cacheKey, JSON.stringify(data), "EX", 300);
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Found help seekers from DB",
-        data: data,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Found help seekers from DB",
+      data: data,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -55,12 +53,49 @@ export const getHelpSeekerById = async (
   res: Response
 ): Promise<void> => {
   const id = req.params.id;
+  const detailLevel = req.query.detail;
+
+  console.log("Detail Level:", detailLevel, detailLevel === "basic");
 
   try {
-    const helpSeeker = await prisma.helpSeeker.findUnique({
-      where: { id: id },
-      include: { user: { select: { isAdminApproved: true } } },
-    });
+    let helpSeeker;
+
+    if (detailLevel === "basic") {
+      helpSeeker = await prisma.helpSeeker.findUnique({
+        where: { id },
+        select: {
+          name: true,
+          occupation: true,
+          state: true,
+          city: true,
+          address: true,
+          company: true,
+          jobType: true,
+          age: true,
+          contact: true,
+          whatsapp: true,
+          alias: true,
+          idProofs: true,
+          user: {
+            select: {
+              isAdminApproved: true,
+            },
+          },
+        },
+      });
+    } else {
+      helpSeeker = await prisma.helpSeeker.findUnique({
+        where: { id },
+        include: {
+          user: {
+            select: {
+              isAdminApproved: true,
+            },
+          },
+        },
+      });
+    }
+
     if (!helpSeeker) {
       res
         .status(404)
@@ -68,12 +103,17 @@ export const getHelpSeekerById = async (
       return;
     }
 
-    res
-      .status(200)
-      .json({ success: true, message: "Help Seeker found", data: helpSeeker });
+    res.status(200).json({
+      success: true,
+      message: "Help Seeker found",
+      data: helpSeeker,
+    });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
   }
 };
 
@@ -86,8 +126,8 @@ export const approveHelpSeeker = async (
 
   try {
     const user = await prisma.user.findUnique({ where: { id: userId } });
-      console.log(req.body);
-      console.log(user);
+    console.log(req.body);
+    console.log(user);
     if (!user) {
       res.status(404).json({ success: false, message: "User not found" });
       return;
@@ -97,14 +137,14 @@ export const approveHelpSeeker = async (
       res
         .status(402)
         .json({ success: false, message: "User is not onboarded yet" });
-        return;
+      return;
     }
 
     if (user?.isAdminApproved) {
       res
         .status(401)
         .json({ success: false, message: "User is already verified" });
-        return;
+      return;
     }
 
     const updatedUser = await prisma.user.update({

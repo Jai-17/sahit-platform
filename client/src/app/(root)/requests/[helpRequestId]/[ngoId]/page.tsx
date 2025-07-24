@@ -45,7 +45,7 @@ const Page = () => {
       await acceptRequestUser({
         ngoId,
         requestId: helpRequestId
-      })
+      }).unwrap();
 
       toast.success("User Approved Successfully!");
       refetch();

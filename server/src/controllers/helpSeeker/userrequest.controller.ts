@@ -23,7 +23,19 @@ export const getAllHelpRequests = async (
 
     const helpRequests = await prisma.helpRequest.findMany({
       where: { userId: helpSeekerId },
-      include: { assignedNGO: true },
+      select: {
+        id: true,
+        ngoId: true,
+        helpType: true,
+        urgency: true,
+        status: true,
+        submittedAt: true,
+        assignedNGO: {
+          select: {
+            name: true
+          }
+        }
+      }
     });
 
     if (!helpRequests || helpRequests.length === 0) {
@@ -35,13 +47,11 @@ export const getAllHelpRequests = async (
 
     await redis.set(cacheKey, JSON.stringify(helpRequests), "EX", 1200);
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Found help requests",
-        data: helpRequests,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Found help requests",
+      data: helpRequests,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -53,8 +63,20 @@ export const getActiveHelpRequest = async (
   res: Response
 ): Promise<void> => {
   const helpSeekerId = req.user.roleId;
+  const cacheKey = `cache:activeHelpRequestOfUser-${helpSeekerId}`
 
   try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log("Returning from cache");
+      res.json({
+        success: true,
+        message: "Found Active Help Request from REDIS",
+        data: JSON.parse(cached),
+      });
+      return;
+    }
+
     const activeRequest = await prisma.helpRequest.findFirst({
       where: {
         userId: helpSeekerId,
@@ -62,7 +84,14 @@ export const getActiveHelpRequest = async (
           in: ["IN_PROGRESS", "SEND_TO_NGOS"],
         },
       },
-      include: { assignedNGO: true },
+      select: {
+        id: true,
+        helpType: true,
+        urgency: true,
+        status: true,
+        submittedAt: true,
+        assignedNGO: { select: { name: true } },
+      },
     });
 
     if (!activeRequest) {
@@ -72,18 +101,77 @@ export const getActiveHelpRequest = async (
       return;
     }
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Found active help request",
-        data: activeRequest,
-      });
+    await redis.set(cacheKey, JSON.stringify(activeRequest), "EX", 1200);
+
+    res.status(200).json({
+      success: true,
+      message: "Found active help request",
+      data: activeRequest,
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+export const getActiveHelpRequestDetails = async (req: Request, res: Response):Promise<void> => {
+  const helpSeekerId = req.user.roleId;
+
+  try {
+    const activeRequest = await prisma.helpRequest.findFirst({
+      where: {
+        userId: helpSeekerId,
+        status: {
+          in: ["IN_PROGRESS", "SEND_TO_NGOS"],
+        },
+      },
+      select: {
+        title: true,
+        description: true,
+        status: true,
+        urgency: true,
+        helpType: true,
+        assignedNGO: {
+          select: {
+            name: true,
+            about: true,
+            city: true,
+            state: true,
+            address: true,
+            rating: true,
+            createdAt: true,
+            supportTypes: true,
+            replyTimeMins: true,
+            email: true,
+            phone: true,
+            whatsappNumber: true,
+            whatsappSame: true,
+            representativeAvailability: true,
+            representativeName: true,
+            representativeTitle: true,
+            userId: true,
+          }
+        }
+      },
+    });
+
+    if (!activeRequest) {
+      res
+        .status(404)
+        .json({ success: false, message: "No active help request found" });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Found active help request",
+      data: activeRequest,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+}
 
 export const getHelpRequestCount = async (
   req: Request,

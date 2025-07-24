@@ -3,7 +3,7 @@
 import IconName from "@/components/common/IconName";
 import InfoTab from "@/components/common/InfoTab";
 import StatusTab from "@/components/common/StatusTab";
-import { useGetActiveHelpRequestQuery } from "@/store/features/protectedApiSlice";
+import { useGetActiveHelpRequestDetailsQuery, useGetActiveHelpRequestQuery } from "@/store/features/protectedApiSlice";
 import { Mail, Phone } from "lucide-react";
 import React from "react";
 import Image from "next/image";
@@ -29,7 +29,7 @@ import TestChat from "@/components/common/TestChat";
 import { useAuth } from "@/lib/hooks/useAuth";
 
 const Page = () => {
-  const { data, isLoading } = useGetActiveHelpRequestQuery(undefined);
+  const { data, isLoading } = useGetActiveHelpRequestDetailsQuery(undefined);
   const auth = useAuth();
   if (isLoading) return <div>Loading...</div>;
 

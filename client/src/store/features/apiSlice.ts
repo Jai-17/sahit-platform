@@ -45,7 +45,7 @@ export const apiSlice = createApi({
 
         getHelpSeekerById: builder.query({
             query: (id) => ({
-                url: `/api/v1/help/user/getUserById/${id}`,
+                url: `/api/v1/help/user/getUserById/${id}?detail=basic`,
             })
         }),
     })
