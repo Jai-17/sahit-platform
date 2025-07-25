@@ -429,3 +429,57 @@ export const registerHelpSeeker = async (
       .json({ success: false, message: "Internal server error", error: error });
   }
 };
+
+export const updateHelpSeeker = async (req: Request, res: Response): Promise<void> => {
+  const {
+    age,
+    occupation,
+    company,
+    jobType,
+    contact,
+    whatsappSame,
+    whatsapp,
+    address,
+    city,
+    state,
+    alias,
+    photo,
+    idProofs,
+  } = req.body;
+  const userIdFromToken = req.user?.userId;
+
+  try {
+    if (!userIdFromToken) {
+      res.status(400).json({ success: false, message: "Invalid user data" });
+      return;
+    }
+
+    await prisma.helpSeeker.update({
+      where: { userId: userIdFromToken },
+      data: {
+        age,
+        address,
+        city,
+        state,
+        contact,
+        company,
+        jobType,
+        photo,
+        occupation,
+        whatsappSame,
+        whatsapp,
+        alias,
+        idProofs
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Help seeker updated successfully"});
+  } catch (error) {
+    console.error("Error during help seeker update:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error", error: error });
+  }
+}

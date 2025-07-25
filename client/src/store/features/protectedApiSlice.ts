@@ -72,6 +72,14 @@ export const protectedApiSlice = createApi({
         method: 'POST',
         body: userData
       })
+    }),
+
+    updateProfile: builder.mutation({
+      query: (userData) => ({
+        url: "/api/v1/help/auth/update-user",
+        method: "PATCH",
+        body: userData
+      })
     })
   }),
 });
@@ -88,5 +96,6 @@ export const {
   useCreateChatTokenMutation,
   useStartChatMutation,
   useGetMessagesByChatRoomIdQuery,
-  useSendMessageMutation
+  useSendMessageMutation,
+  useUpdateProfileMutation
 } = protectedApiSlice;
