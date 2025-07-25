@@ -40,8 +40,14 @@ export const apiSlice = createApi({
             query: (id) => ({
                 url: `/api/v1/ngo/request/${id}`
             })
+        }),
+
+        getNGOById: builder.query({
+            query: (id) => ({
+                url: `/api/v1/ngo/user/getUserById/${id}`
+            })
         })
     })
 })
 
-export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation, useGetIncomingRequestByIdQuery, useGetHelpRequestByIdQuery } = apiSlice;
+export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation, useGetIncomingRequestByIdQuery, useGetHelpRequestByIdQuery, useGetNGOByIdQuery } = apiSlice;

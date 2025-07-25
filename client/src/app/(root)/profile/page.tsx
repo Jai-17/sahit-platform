@@ -2,7 +2,7 @@
 "use client";
 
 import CustomFormField from "@/components/forms/FormField";
-import ProfileLoader from "@/components/forms/ProfileLoader";
+import ProfileLoader from "@/components/loaders/ProfileLoader";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {

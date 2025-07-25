@@ -347,3 +347,46 @@ export const refreshAccessToken = async (
   );
   console.log("GOING OUTSIDE JWT");
 };
+
+// UPDATE NGO PROFILE
+export const updateNGOProfile = async (req: Request, res: Response): Promise<void> => {
+  const { userId } = req.user;
+  const {replyTimeMins, supportTypes, address, city, state, phone, whatsappSame, whatsappNumber, about, representativeName, representativeTitle, representativeAvailability} = req.body;
+
+  try {
+    if(!userId) {
+      res.status(400).json({ success: false, message: "User ID is required" });
+      return;
+    }
+
+    await prisma.nGO.update({
+      where: { userId: userId },
+      data: {
+        replyTimeMins: parseInt(replyTimeMins),
+        supportTypes,
+        address,
+        city,
+        state,
+        phone,
+        whatsappSame,
+        whatsappNumber,
+        about,
+        representativeName,
+        representativeTitle,
+        representativeAvailability
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating NGO profile:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error
+    });
+  }
+}
