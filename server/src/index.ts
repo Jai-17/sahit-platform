@@ -22,7 +22,6 @@ import requestNGORoutes from './routes/ngo/ngorequest.route';
 import chatRoutes from './routes/chat/chat.routes';
 
 const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
-
 dotenv.config();
 const app = express();
 app.use(express.json());

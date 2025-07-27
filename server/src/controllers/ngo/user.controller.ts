@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import redis from "../../utils/redis";
 import { prisma } from "../../db";
+import { qdrantVectorStore } from "../../utils/qdrant";
 
 export const getAllNgos = async (
   req: Request,
@@ -143,10 +144,29 @@ export const registerNGO = async (
       },
     });
 
-    const user = await prisma.user.update({
+    await prisma.user.update({
       where: { email: emailFromToken },
       data: { isOnboarded: true },
     });
+
+    // ADD TO VECTOR DATABASE
+    try {
+      await qdrantVectorStore.addDocuments([
+        {
+          pageContent: about,
+          metadata: {
+            ngoId: ngo.id,
+            name: ngo.name,
+            city: ngo.city,
+            state: ngo.state,
+            address: ngo.address,
+            supportTypes: ngo.supportTypes,
+          }
+        }
+      ])
+    } catch (error) {
+      console.error("Error adding NGO to vector database:", error);
+    }
 
     res.status(200).json({
       success: true,

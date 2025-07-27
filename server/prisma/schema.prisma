@@ -47,6 +47,7 @@ model NGO {
   whatsappSame   Boolean    @default(true)
   whatsappNumber String?
   about          String
+  nominateAward  Boolean @default(false)
 
   representativeName         String
   representativeTitle        String
@@ -80,6 +81,7 @@ model HelpSeeker {
   alias        String
   idProofs     String
   createdAt    DateTime @default(now())
+  nominateAward  Boolean @default(false)
 
   helpRequests HelpRequest[]
   feedbacks    Feedback[]
