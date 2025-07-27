@@ -88,7 +88,14 @@ export const protectedApiSlice = createApi({
         method: 'POST',
         body: userData
       })
-    })
+    }),
+
+    deleteHelpRequest: builder.mutation({
+      query: (requestId) => ({
+        url: `/api/v1/request/delete/${requestId}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 });
 
@@ -107,4 +114,5 @@ export const {
   useSendMessageMutation,
   useUpdateProfileMutation,
   useGiveFeedbackMutation,
+  useDeleteHelpRequestMutation,
 } = protectedApiSlice;

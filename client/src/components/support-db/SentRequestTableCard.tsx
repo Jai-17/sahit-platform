@@ -13,9 +13,9 @@ const SentRequestTableCard = ({ data }: { data: HelpRequest }) => {
     <div>
       <div
         onClick={() =>
-          data.status == "IN_PROGRESS"
+          (data.status == "IN_PROGRESS")
             ? router.push(`/requests/active/${data.id}`)
-            : router.push(`/history/${data.id}`)
+            : ((data.status == "SEND_TO_NGOS" || data.status == "DECLINED_BY_ALL") ? router.push(`/requests/pending/${data.id}/`) : router.push(`/history/${data.id}`))
         }
         className="bg-white mt-7 lg:mt-0 flex justify-between items-start shadow-lg/5 cursor-pointer hover:shadow-lg/5 transition duration-300 border border-neutral-200 py-6 px-5 lg:px-7 rounded-lg"
       >
@@ -30,7 +30,7 @@ const SentRequestTableCard = ({ data }: { data: HelpRequest }) => {
             <span className="lg:hidden font-semibold text-sm text-black">
               NGO Name:{" "}
             </span>
-            {data?.assignedNGO.name}
+            {data.status === "SEND_TO_NGOS" ? "Not Assigned Yet" : data?.assignedNGO.name}
           </p>
           <p>
             <span className="lg:hidden font-semibold text-sm text-black">

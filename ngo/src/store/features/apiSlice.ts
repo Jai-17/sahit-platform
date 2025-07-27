@@ -31,8 +31,8 @@ export const apiSlice = createApi({
 
         // HELP REQUESTS
         getIncomingRequestById: builder.query({
-            query: (id) => ({
-                url: `/api/v1/request/user/${id}`
+            query: ({id, ngoId}) => ({
+                url: `/api/v1/request/user/${id}?ngoId=${ngoId}`
             })
         }),
 

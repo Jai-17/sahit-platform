@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Image from "next/image";
 import {
   useAcceptRequestUserMutation,
+  useDeclineRequestUserMutation,
   useGetNGOByIdQuery,
 } from "@/store/features/apiSlice";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 import {
@@ -30,8 +32,10 @@ const Page = () => {
   // const helpRequestId = params.helpRequestId as string;
   // const ngoId = params.ngoId as string;
   const [acceptRequestUser] = useAcceptRequestUserMutation();
+  const [declineRequestUser] = useDeclineRequestUserMutation();
   const { helpRequestId, ngoId } = useParams();
- 
+  const router = useRouter();
+
   const { data, isLoading, refetch } = useGetNGOByIdQuery(ngoId);
   console.log(data);
 
@@ -44,14 +48,27 @@ const Page = () => {
       // }).unwrap();
       await acceptRequestUser({
         ngoId,
-        requestId: helpRequestId
+        requestId: helpRequestId,
       }).unwrap();
 
       toast.success("User Approved Successfully!");
       refetch();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error("Error Approving User", error);
+    }
+  }
+
+  async function onDecline() {
+    try {
+      await declineRequestUser({
+        ngoId,
+        requestId: helpRequestId,
+      }).unwrap();
+
+      toast.success("Declined Request");
+      router.push('/');
+    } catch (error: any) {
+      toast.error("Error declining", error);
     }
   }
 
@@ -66,7 +83,7 @@ const Page = () => {
             Incoming Request NGO Details
           </p>
         </div>
-        {(
+        {
           <div className="flex gap-2 mt-5 md:mt-0">
             <AlertDialog>
               <AlertDialogTrigger className="border outline-none border-red-500 text-red-500 bg-transparent hover:bg-red-50 h-10 px-7 rounded-md transition duration-200 ease-in cursor-pointer">
@@ -84,7 +101,7 @@ const Page = () => {
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     className="bg-red-500 hover:bg-red-300"
-                    onClick={onSubmit}
+                    onClick={onDecline}
                   >
                     Decline
                   </AlertDialogAction>
@@ -115,7 +132,7 @@ const Page = () => {
               </AlertDialogContent>
             </AlertDialog>
           </div>
-        )}
+        }
       </div>
       <div className="mt-7">
         <div className="flex flex-col md:flex-row gap-5 md:items-center">
@@ -207,31 +224,32 @@ const Page = () => {
         <div className="mt-5">
           <InfoCard heading="ID Proofs">
             <div className="flex flex-col gap-5">
-              {data.data.verifiedDocs.length > 0 ?
-              (data.data.verifiedDocs.map((url: string) => {
-                const isPdf = url.toLowerCase().endsWith(".pdf");
+              {data.data.verifiedDocs.length > 0 ? (
+                data.data.verifiedDocs.map((url: string) => {
+                  const isPdf = url.toLowerCase().endsWith(".pdf");
 
-                return isPdf ? (
-                  <a
-                    key={url}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-neutral-300 py-2 px-4 w-fit rounded-md border outline-dashed scale-100 hover:scale-105 transition-all duration-300 ease-in text-neutral-700 hover:text-black"
-                  >
-                    View PDF Document
-                  </a>
-                ) : (
-                  <Image
-                    key={url}
-                    src={url}
-                    width={500}
-                    height={400}
-                    alt="ID Proof"
-                    className="rounded-lg my-2"
-                  />
-                );
-              })) : (
+                  return isPdf ? (
+                    <a
+                      key={url}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-neutral-300 py-2 px-4 w-fit rounded-md border outline-dashed scale-100 hover:scale-105 transition-all duration-300 ease-in text-neutral-700 hover:text-black"
+                    >
+                      View PDF Document
+                    </a>
+                  ) : (
+                    <Image
+                      key={url}
+                      src={url}
+                      width={500}
+                      height={400}
+                      alt="ID Proof"
+                      className="rounded-lg my-2"
+                    />
+                  );
+                })
+              ) : (
                 <p>No ID Proofs Uploaded</p>
               )}
             </div>

@@ -64,6 +64,11 @@ interface HelpSeeker {
     whatsappSame: boolean;
 }
 
+interface IncomingRequest {
+    status: string;
+    helpRequest: HelpRequest;
+}
+
 interface HelpRequest {
   id: string;
   description: string;
@@ -77,5 +82,6 @@ interface HelpRequest {
   user: {
     name: string;
     alias: string;
+    city: string;
   };
 }

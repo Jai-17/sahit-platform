@@ -3,7 +3,7 @@
 import InfoTab from "@/components/common/InfoTab";
 import StatusTab from "@/components/common/StatusTab";
 import { useGetIncomingRequestByIdQuery } from "@/store/features/apiSlice";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React from "react";
 import { format } from "date-fns";
 import Image from "next/image";
@@ -21,13 +21,17 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { useAcceptIncomingRequestMutation } from "@/store/features/protectedApiSlice";
+import { useAcceptIncomingRequestMutation, useDeclineIncomingRequestMutation } from "@/store/features/protectedApiSlice";
+import { useAuth } from "@/lib/hooks/useAuth";
 
 const Page = () => {
   const params = useParams();
   const id = params.id;
-  const { data, isLoading, refetch } = useGetIncomingRequestByIdQuery(id);
+  const auth = useAuth();
+  const router = useRouter();
+  const { data, isLoading, refetch } = useGetIncomingRequestByIdQuery({ id, ngoId: auth.roleId });
   const [acceptIncomingRequest] = useAcceptIncomingRequestMutation();
+  const [declineIncomingRequest] = useDeclineIncomingRequestMutation();
 
   if (isLoading) return <div>Loading...</div>;
   console.log(data);
@@ -47,6 +51,21 @@ const Page = () => {
     }
   }
 
+  async function onDecline() {
+    console.log("decline");
+    try {
+
+      await declineIncomingRequest({
+        requestId: id
+      }).unwrap()
+      toast.success("Request Declined");
+      router.push('/');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error('Error Declining Request', error);
+    }
+  }
+
   return (
     <div>
       <div className="flex flex-col md:flex-row md:items-end justify-between">
@@ -55,7 +74,7 @@ const Page = () => {
             Incoming Requests
           </h1>
         </div>
-        {!["IN_PROGRESS", "RESOLVED", "ACCEPTED_BY_NGO"].includes(data?.data.status) && (
+        {data.data.helpRequestNGOStatuses[0].status != "ACCEPTED" && (
           <div className="flex gap-2 mt-5 md:mt-0">
             <AlertDialog>
               <AlertDialogTrigger className="border outline-none border-red-500 text-red-500 bg-transparent hover:bg-red-50 h-10 px-7 rounded-md transition duration-200 ease-in cursor-pointer">
@@ -73,7 +92,7 @@ const Page = () => {
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     className="bg-red-500 hover:bg-red-300"
-                    onClick={onSubmit}
+                    onClick={onDecline}
                   >
                     Decline
                   </AlertDialogAction>
@@ -88,8 +107,7 @@ const Page = () => {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Accept Request</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. Are you sure to approve the
-                    User?
+                    This action cannot be undone. Are you sure to accept the request?
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

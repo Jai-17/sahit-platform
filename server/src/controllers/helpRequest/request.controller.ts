@@ -125,16 +125,68 @@ export const createRequest = async (
   }
 };
 
+export const deleteRequest = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const requestId = req.params.requestId;
+  const userId = req.user.roleId;
+  console.log("USER ID", userId);
+  console.log("REQUEST ID", requestId);
+  try {
+    const helpRequest = await prisma.helpRequest.findUnique({
+      where: { id: requestId },
+    });
+
+    if (!helpRequest) {
+      res
+        .status(404)
+        .json({ success: false, message: "Help Request not found" });
+      return;
+    }
+
+    if (helpRequest.userId !== userId) {
+      res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this request",
+      });
+      return;
+    }
+
+    await prisma.helpRequest.delete({
+      where: { id: requestId },
+    });
+
+    redis.del(`cache:allHelpRequests-${userId}`);
+
+    res.status(200).json({
+      success: true,
+      message: "Help Request deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
 export const getUserHelpRequestById = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   const requestId = req.params.id;
-
+  const ngoId = req.query.ngoId as string;
+  console.log("NGO ID", ngoId);
   try {
     const helpRequest = await prisma.helpRequest.findUnique({
       where: { id: requestId },
-      include: { user: true },
+      include: {
+        user: true,
+        helpRequestNGOStatuses: {
+          where: { ngoId },
+          select: {
+            status: true,
+          },
+        },
+      },
     });
     if (!helpRequest) {
       res
@@ -158,21 +210,16 @@ export const acceptRequestNGO = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const userId = req.user?.userId;
+  const userId = req.user?.roleId;
   console.log("COMING FROM CONTROLLER USER ID", userId);
   const requestId = req.body.requestId;
 
   try {
-    const roleId = await prisma.nGO.findUnique({
-      where: { userId },
-      select: { id: true },
-    });
-
     const updatedRequest = await prisma.helpRequestNGOStatus.update({
       where: {
         helpRequestId_ngoId: {
           helpRequestId: requestId,
-          ngoId: roleId?.id!,
+          ngoId: userId,
         },
       },
       data: {
@@ -191,6 +238,50 @@ export const acceptRequestNGO = async (
       success: true,
       message: "Request accepted by NGO",
       data: updatedRequest,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export const declineRequestNGO = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const ngoId = req.user?.roleId;
+  // const ngoId = "994edff7-8754-4d78-9f1d-0c595c0c4fa2";
+  const helpRequestId = req.body.requestId;
+
+  try {
+    // 1.
+    await prisma.helpRequestNGOStatus.deleteMany({
+      where: {
+        helpRequestId,
+        ngoId,
+      },
+    });
+
+    // 2.
+    const remaining = await prisma.helpRequestNGOStatus.count({
+      where: {
+        helpRequestId,
+      },
+    });
+
+    // 3.
+    if (remaining === 0) {
+      await prisma.helpRequest.update({
+        where: { id: helpRequestId },
+        data: {
+          status: "DECLINED_BY_ALL",
+        },
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Request declined by NGO",
     });
   } catch (error) {
     console.error("Error:", error);
@@ -242,10 +333,10 @@ export const getRequestAcceptByNGO = async (
             rating: true,
             replyTimeMins: true,
             supportTypes: true,
-            id: true
-          }
-        }
-      }
+            id: true,
+          },
+        },
+      },
     });
 
     if (!acceptedByNGOs) {
@@ -298,6 +389,49 @@ export const acceptRequestUser = async (
     res.status(200).json({
       success: true,
       message: "Help Request Successfully assigned to NGO",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export const declineRequestUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const ngoId = req.body.ngoId;
+  const helpRequestId = req.body.requestId;
+
+  try {
+    // 1. Delete this NGO's status entry for the help request
+    await prisma.helpRequestNGOStatus.deleteMany({
+      where: {
+        helpRequestId,
+        ngoId,
+      },
+    });
+
+    // 2. Check if any other NGOs are left assigned to this help request
+    const remainingNGOs = await prisma.helpRequestNGOStatus.count({
+      where: {
+        helpRequestId,
+      },
+    });
+
+    // 3. If no NGOs are left, mark the help request as DECLINED_BY_ALL
+    if (remainingNGOs === 0) {
+      await prisma.helpRequest.update({
+        where: { id: helpRequestId },
+        data: {
+          status: "DECLINED_BY_ALL",
+        },
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "NGO has declined the request successfully.",
     });
   } catch (error) {
     console.error("Error:", error);

@@ -80,13 +80,12 @@ const HomePage = () => {
         {(isLoadingIncomingRequest ? <div><Skeleton className="mt-10 h-20" /></div> :
           incomingRequest?.data.length > 0 && (
             <>
-              <h1 className="text-2xl font-semibold">Incoming Requests</h1>(
+              <h1 className="text-2xl font-semibold mt-5">Incoming Requests</h1>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 mt-7 gap-4">
                 {incomingRequest.data.map((data: any) => (
-                  <IncomingRequestCard key={data.id} data={data} />
+                  <IncomingRequestCard key={data.helpRequestId} data={data} />
                 ))}
               </div>
-              )
             </>
           )
         )}

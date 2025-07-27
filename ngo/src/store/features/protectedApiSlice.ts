@@ -18,7 +18,7 @@ export const protectedApiSlice = createApi({
     }),
 
     incomingRequest: builder.query({
-      query: () => "/api/v1/ngo/request/incoming-requests",
+      query: () => `/api/v1/ngo/request/incoming-requests`,
     }),
 
     acceptIncomingRequest: builder.mutation({
@@ -29,8 +29,20 @@ export const protectedApiSlice = createApi({
       }),
     }),
 
+    declineIncomingRequest: builder.mutation({
+      query: (userData) => ({
+        url: "/api/v1/request/decline/ngo",
+        method: "POST",
+        body: userData,
+      }),
+    }),
+
     getAllHelpRequest: builder.query({
       query: () => '/api/v1/ngo/request/all-requests'
+    }),
+
+    getAllActiveRequests: builder.query({
+      query: () => '/api/v1/ngo/request/all-active-requests'
     }),
 
     getDBStats: builder.query({
@@ -86,5 +98,7 @@ export const {
   useGetMessagesByChatRoomIdQuery,
   useSendMessageMutation,
   useUpdateProfileMutation,
-  useGetFeedbackQuery
+  useGetFeedbackQuery,
+  useGetAllActiveRequestsQuery,
+  useDeclineIncomingRequestMutation
 } = protectedApiSlice;

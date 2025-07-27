@@ -46,9 +46,10 @@ export const getIncomingHelpRequests = async (
               },
             },
           },
+          status: true,
         },
       })
-    ).map((item) => item.helpRequest);
+    );
 
     if (!helpRequests) {
       res.status(404).json({ success: false, message: "NGO Not Found" });
@@ -88,7 +89,7 @@ export const getAllHelpRequest = async (
     }
 
     const helpRequests = await prisma.helpRequest.findMany({
-      where: { ngoId: ngoId },
+      where: { ngoId: ngoId, status: {notIn: ["SEND_TO_NGOS"]} },
       select: {
         id: true,
         ngoId: true,
@@ -106,7 +107,68 @@ export const getAllHelpRequest = async (
       }
     });
 
-    if (!helpRequests || helpRequests.length === 0) {
+    if (!helpRequests) {
+      res
+        .status(404)
+        .json({ success: false, message: "No help requests found" });
+      return;
+    }
+
+    await redis.set(cacheKey, JSON.stringify(helpRequests), "EX", 1200);
+
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Found help requests",
+        data: helpRequests,
+      });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export const getAllActiveHelpRequest = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const ngoId = req.user.roleId;
+  const cacheKey = `cache:allActiveHelpRequestForNGO-${ngoId}`
+
+  try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log("Returning from cache");
+      res.json({
+        success: true,
+        message: "Found Help Request from REDIS",
+        data: JSON.parse(cached),
+      });
+      return;
+    }
+
+    const helpRequests = await prisma.helpRequest.findMany({
+      where: { ngoId: ngoId, status: {in: ["IN_PROGRESS"]} },
+      select: {
+        id: true,
+        ngoId: true,
+        hideFace: true,
+        helpType: true,
+        urgency: true,
+        status: true,
+        submittedAt: true,
+        user: {
+          select: {
+            name: true,
+            alias: true
+          }
+        }
+      }
+    });
+
+    if (!helpRequests) {
       res
         .status(404)
         .json({ success: false, message: "No help requests found" });

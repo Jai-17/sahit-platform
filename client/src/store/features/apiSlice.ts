@@ -43,6 +43,14 @@ export const apiSlice = createApi({
             })
         }),
 
+        declineRequestUser: builder.mutation({
+            query: (userData) => ({
+                url: '/api/v1/request/decline/user',
+                method: 'POST',
+                body: userData
+            })
+        }),
+
         getHelpSeekerById: builder.query({
             query: (id) => ({
                 url: `/api/v1/help/user/getUserById/${id}?detail=basic`,
@@ -63,4 +71,4 @@ export const apiSlice = createApi({
     })
 })
 
-export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation, useGetNGOByIdQuery, useAcceptRequestUserMutation, useGetHelpSeekerByIdQuery, useGetHelpSeekerByIdDetailedQuery, useGetHelpRequestByIdQuery } = apiSlice;
+export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation, useGetNGOByIdQuery, useAcceptRequestUserMutation, useGetHelpSeekerByIdQuery, useGetHelpSeekerByIdDetailedQuery, useGetHelpRequestByIdQuery, useDeclineRequestUserMutation } = apiSlice;

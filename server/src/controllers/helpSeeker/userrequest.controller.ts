@@ -37,6 +37,9 @@ export const getAllHelpRequests = async (
           },
         },
       },
+      orderBy: {
+        submittedAt: "desc",
+      }
     });
 
     if (!helpRequests || helpRequests.length === 0) {
@@ -126,7 +129,7 @@ export const getActiveHelpRequestDetails = async (
       where: {
         userId: helpSeekerId,
         status: {
-          in: ["IN_PROGRESS", "SEND_TO_NGOS"],
+          in: ["IN_PROGRESS", "SEND_TO_NGOS", "DECLINED_BY_ALL"],
         },
       },
       select: {
@@ -135,6 +138,7 @@ export const getActiveHelpRequestDetails = async (
         status: true,
         urgency: true,
         helpType: true,
+        id: true,
         assignedNGO: {
           select: {
             name: true,

@@ -146,4 +146,4 @@ const worker = new Worker(
   }
 );
 
-// worker.pause();
+worker.pause();
