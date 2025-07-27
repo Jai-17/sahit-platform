@@ -54,7 +54,13 @@ export const apiSlice = createApi({
                 url: `/api/v1/help/user/getUserById/${id}`,
             })
         }),
+
+        getHelpRequestById: builder.query({
+            query: (id) => ({
+                url: `/api/v1/help/request/help-request/${id}`
+            })
+        })
     })
 })
 
-export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation, useGetNGOByIdQuery, useAcceptRequestUserMutation, useGetHelpSeekerByIdQuery, useGetHelpSeekerByIdDetailedQuery } = apiSlice;
+export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation, useGetNGOByIdQuery, useAcceptRequestUserMutation, useGetHelpSeekerByIdQuery, useGetHelpSeekerByIdDetailedQuery, useGetHelpRequestByIdQuery } = apiSlice;

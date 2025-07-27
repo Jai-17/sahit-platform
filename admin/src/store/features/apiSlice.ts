@@ -45,8 +45,14 @@ export const apiSlice = createApi({
 
         getDBStats: builder.query({
             query: () => '/api/v1/request/admin-stats'
+        }),
+
+        getNGOFeedbacks: builder.query({
+            query: (ngoId) => ({
+                url: `/api/v1/ngo/user/get-feedbacks?ngoId=${ngoId}&limit=5`,
+            })
         })
     })
 })
 
-export const { useGetAllHelpSeekerQuery, useGetHelpSeekerByIdQuery, useHelpSeekerAdminApproveMutation, useGetAllNGOsQuery, useGetNGOByIdQuery, useNgoAdminApproveMutation, useGetDBStatsQuery } = apiSlice;
+export const { useGetAllHelpSeekerQuery, useGetHelpSeekerByIdQuery, useHelpSeekerAdminApproveMutation, useGetAllNGOsQuery, useGetNGOByIdQuery, useNgoAdminApproveMutation, useGetDBStatsQuery, useGetNGOFeedbacksQuery } = apiSlice;

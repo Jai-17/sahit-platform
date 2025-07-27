@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../../db";
 import redis from "../../utils/redis";
+import chatClient, { deleteChatBetweenUsers } from "../../chat";
 
 export const getIncomingHelpRequests = async (
   req: Request,
@@ -197,3 +198,63 @@ export const getHelpRequestById = async (
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+export const ngoMarkAsResolved = async (req: Request, res: Response): Promise<void> => {
+  const {requestId} = req.body;
+
+  try {
+    if (!requestId) {
+      res.status(400).json({
+        success: false,
+        message: "Request ID is required",
+      });
+      return;
+    }
+
+    const helpRequest = await prisma.helpRequest.findUnique({
+      where: {id: requestId},
+      include: {
+        user: {select: {userId: true}},
+        assignedNGO: {select: {userId: true}},
+      }
+    })
+
+    if (!helpRequest) {
+      res.status(404).json({
+        success: false,
+        message: "Help request not found",
+      });
+      return;
+    }
+
+    if(helpRequest.ngoResolved) {
+      res.status(400).json({
+        success: false,
+        message: "Help request is already resolved by NGO",
+      });
+      return;
+    }
+
+    const updateData: any = {
+      ngoResolved: true,
+    }
+
+    if(helpRequest.seekerResolved) {
+      updateData.status = "RESOLVED";
+      await deleteChatBetweenUsers(chatClient, helpRequest.user.userId, helpRequest.assignedNGO!.userId);
+    }
+
+    await prisma.helpRequest.update({
+      where: {id: requestId},
+      data: updateData,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: updateData.status === "RESOLVED" ? "Help request marked as resolved" : "Marking as resolved from NGO side. Waiting for Help Seeker confirmation.",
+    })
+  } catch (error) {
+    console.error("Error marking help request as resolved:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+}

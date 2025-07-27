@@ -114,6 +114,9 @@ model HelpRequest {
   urgency HelpUrgency
   status  HelpStatus  @default(PENDING)
 
+  seekerResolved Boolean @default(false)
+  ngoResolved    Boolean @default(false)
+
   assignedNGO NGO?    @relation("AssignedNGO", fields: [ngoId], references: [id])
   ngoId       String?
 

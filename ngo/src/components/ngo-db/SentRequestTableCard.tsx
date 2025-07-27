@@ -15,7 +15,7 @@ const SentRequestTableCard = ({ data }: { data: HelpRequest }) => {
         onClick={() =>
           data.status == "IN_PROGRESS"
             ? router.push(`/requests/active/${data.id}`)
-            : router.push(`/history/${data.id}/${data.ngoId}`)
+            : router.push(`/history/${data.id}`)
         }
         className="bg-white mt-7 lg:mt-0 flex justify-between items-start shadow-lg/5 cursor-pointer hover:shadow-lg/5 transition duration-300 border border-neutral-200 py-6 px-5 lg:px-7 rounded-lg"
       >

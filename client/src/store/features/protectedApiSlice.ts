@@ -80,6 +80,14 @@ export const protectedApiSlice = createApi({
         method: "PATCH",
         body: userData
       })
+    }),
+
+    giveFeedback: builder.mutation({
+      query: (userData) => ({
+        url: '/api/v1/help/request/feedback',
+        method: 'POST',
+        body: userData
+      })
     })
   }),
 });
@@ -97,5 +105,6 @@ export const {
   useStartChatMutation,
   useGetMessagesByChatRoomIdQuery,
   useSendMessageMutation,
-  useUpdateProfileMutation
+  useUpdateProfileMutation,
+  useGiveFeedbackMutation,
 } = protectedApiSlice;

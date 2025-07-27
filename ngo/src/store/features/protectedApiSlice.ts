@@ -66,6 +66,12 @@ export const protectedApiSlice = createApi({
         body: userData
       })
     }),
+
+    getFeedback: builder.query({
+      query: (ngoId) => ({
+        url: `/api/v1/ngo/user/get-feedbacks?ngoId=${ngoId}`,
+      })
+    })
   }),
 });
 
@@ -80,4 +86,5 @@ export const {
   useGetMessagesByChatRoomIdQuery,
   useSendMessageMutation,
   useUpdateProfileMutation,
+  useGetFeedbackQuery
 } = protectedApiSlice;

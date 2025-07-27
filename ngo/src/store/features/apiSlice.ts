@@ -46,7 +46,7 @@ export const apiSlice = createApi({
             query: (id) => ({
                 url: `/api/v1/ngo/user/getUserById/${id}`
             })
-        })
+        }),
     })
 })
 

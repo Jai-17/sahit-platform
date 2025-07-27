@@ -3,7 +3,7 @@
 import IconName from "@/components/common/IconName";
 import InfoTab from "@/components/common/InfoTab";
 import StatusTab from "@/components/common/StatusTab";
-import { useGetActiveHelpRequestDetailsQuery, useGetActiveHelpRequestQuery } from "@/store/features/protectedApiSlice";
+import { useGetActiveHelpRequestDetailsQuery } from "@/store/features/protectedApiSlice";
 import { Mail, Phone } from "lucide-react";
 import React from "react";
 import Image from "next/image";

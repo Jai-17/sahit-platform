@@ -3,6 +3,7 @@
 import Image from "next/image";
 import {
   useGetNGOByIdQuery,
+  useGetNGOFeedbacksQuery,
   useNgoAdminApproveMutation,
 } from "@/store/features/apiSlice";
 import { useParams } from "next/navigation";
@@ -26,6 +27,13 @@ import { format } from "date-fns";
 import { Mail, Phone } from "lucide-react";
 import InfoCard from "@/components/InfoPage/InfoCard";
 
+interface FeedbackData {
+  id: string;
+  rating: number;
+  content: string;
+  createdAt: string;
+}
+
 const Page = () => {
   const params = useParams();
   const id = params.id;
@@ -33,6 +41,8 @@ const Page = () => {
 
   const { data, isLoading, refetch } = useGetNGOByIdQuery(id);
   const [ngoAdminApprove] = useNgoAdminApproveMutation();
+  const { data: feedbacks, isLoading: isLoadingFeedback } =
+    useGetNGOFeedbacksQuery(id);
   console.log(data);
 
   if (isLoading) return <div>Loading...</div>;
@@ -184,34 +194,68 @@ const Page = () => {
         <div className="mt-5">
           <InfoCard heading="ID Proofs">
             <div className="flex flex-col gap-5">
-              {data.data.verifiedDocs.length > 0 ?
-              (data.data.verifiedDocs.map((url: string) => {
-                const isPdf = url.toLowerCase().endsWith(".pdf");
+              {data.data.verifiedDocs.length > 0 ? (
+                data.data.verifiedDocs.map((url: string) => {
+                  const isPdf = url.toLowerCase().endsWith(".pdf");
 
-                return isPdf ? (
-                  <a
-                    key={url}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-neutral-300 py-2 px-4 w-fit rounded-md border outline-dashed scale-100 hover:scale-105 transition-all duration-300 ease-in text-neutral-700 hover:text-black"
-                  >
-                    View PDF Document
-                  </a>
-                ) : (
-                  <Image
-                    key={url}
-                    src={url}
-                    width={500}
-                    height={400}
-                    alt="ID Proof"
-                    className="rounded-lg my-2"
-                  />
-                );
-              })) : (
+                  return isPdf ? (
+                    <a
+                      key={url}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-neutral-300 py-2 px-4 w-fit rounded-md border outline-dashed scale-100 hover:scale-105 transition-all duration-300 ease-in text-neutral-700 hover:text-black"
+                    >
+                      View PDF Document
+                    </a>
+                  ) : (
+                    <Image
+                      key={url}
+                      src={url}
+                      width={500}
+                      height={400}
+                      alt="ID Proof"
+                      className="rounded-lg my-2"
+                    />
+                  );
+                })
+              ) : (
                 <p>No ID Proofs Uploaded</p>
               )}
             </div>
+          </InfoCard>
+        </div>
+        <div className="mt-5">
+          <InfoCard heading="Feedbacks">
+            {!isLoadingFeedback ? (
+              feedbacks.data.length > 0 ? (
+                feedbacks.data.map((feedback: FeedbackData) => (
+                  <div
+                    key={feedback.id}
+                    className="bg-[#F7F8FA] p-5 rounded-lg border border-neutral-200 mt-5"
+                  >
+                    <div className="flex gap-2">
+                      <StatusTab
+                        title={`⭐ ${feedback.rating}`}
+                        color="PRIMARY"
+                      />
+                      <StatusTab
+                        title={`On ${format(
+                          new Date(feedback.createdAt),
+                          "PPP"
+                        )}`}
+                        color="GRAY"
+                      />
+                    </div>
+                    <p className="text-lg mt-3">{feedback.content}</p>
+                  </div>
+                ))
+              ) : (
+                <div>No feedbacks yet!</div>
+              )
+            ) : (
+              <div>Loading Feedbacks...</div>
+            )}
           </InfoCard>
         </div>
       </div>

@@ -302,3 +302,25 @@ export const ngoDashboardStat = async (
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const getFeedback = async (req: Request, res: Response):Promise<void> => {
+  const queryNGOId = req.query.ngoId;
+  const limit = req.params.limit && parseInt(req.params.limit);
+
+  try {
+    const feedback = await prisma.feedback.findMany({
+      where: {ngoId: queryNGOId as string},
+      orderBy: { createdAt: "desc" },
+      ...(limit && {take: limit})
+    })
+
+    res.status(200).json({
+      success: true,
+      message: "Feedback found",
+      data: feedback,
+    })
+  } catch (error) {
+    console.error("Error fetching feedback:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+}

@@ -8,6 +8,7 @@ import {
   LogOut,
   MessageSquareDot,
   Settings,
+  Star,
   User,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -25,6 +26,7 @@ const navItems = [
     icon: <MessageSquareDot size={18} />,
   },
   { label: "History", path: "/history", icon: <History size={18} /> },
+  {label: "Feedbacks", path: "/feedbacks", icon: <Star size={18} />},
   { label: "Profile", path: "/profile", icon: <User size={18} /> },
 ];
 
