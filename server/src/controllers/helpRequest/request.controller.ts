@@ -279,6 +279,8 @@ export const declineRequestNGO = async (
       });
     }
 
+    redis.del(`cache:incomingRequests-${ngoId}`);
+
     res.status(200).json({
       success: true,
       message: "Request declined by NGO",
@@ -363,7 +365,7 @@ export const acceptRequestUser = async (
 ): Promise<void> => {
   const ngoId = req.body.ngoId;
   const helpRequestId = req.body.requestId;
-
+  const roleId = req.user.roleId;
   try {
     // 1. Assign the ngo to HelpRequestTable and update status
     await prisma.helpRequest.update({
@@ -386,6 +388,12 @@ export const acceptRequestUser = async (
       },
     });
 
+    redis.del(`cache:allActiveHelpRequestForNGO-${ngoId}`);
+    redis.del(`cache:incomingRequests-${ngoId}`);
+    redis.del(`cache:activeHelpRequestOfUser-${roleId}`);
+    redis.del(`cache:allHelpRequests-${roleId}`);
+    redis.del(`cache:requestAcceptedByNGOForUser-${roleId}`);
+    
     res.status(200).json({
       success: true,
       message: "Help Request Successfully assigned to NGO",

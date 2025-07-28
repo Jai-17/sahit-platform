@@ -104,6 +104,9 @@ export const getAllHelpRequest = async (
             alias: true
           }
         }
+      },
+      orderBy: {
+        submittedAt: "desc"
       }
     });
 
@@ -150,7 +153,7 @@ export const getAllActiveHelpRequest = async (
     }
 
     const helpRequests = await prisma.helpRequest.findMany({
-      where: { ngoId: ngoId, status: {in: ["IN_PROGRESS"]} },
+      where: { ngoId: ngoId, status: {in: ["IN_PROGRESS", "PENDING"]} },
       select: {
         id: true,
         ngoId: true,
@@ -202,10 +205,11 @@ export const getHelpRequestById = async (
     const helpRequest = await prisma.helpRequest.findUnique({
       where: { id: helpRequestId },
       select: {
-        hideId: true,
         title: true,
         description: true,
         hideName: true,
+        hideFace: true,
+        hideId: true,
         status: true,
         urgency: true,
         helpType: true,
@@ -299,6 +303,7 @@ export const ngoMarkAsResolved = async (req: Request, res: Response): Promise<vo
 
     const updateData: any = {
       ngoResolved: true,
+      status: "PENDING",
     }
 
     if(helpRequest.seekerResolved) {
@@ -310,6 +315,11 @@ export const ngoMarkAsResolved = async (req: Request, res: Response): Promise<vo
       where: {id: requestId},
       data: updateData,
     });
+
+    redis.del(`cache:allActiveHelpRequestForNGO-${helpRequest.assignedNGO!.userId}`);
+    redis.del(`cache:allHelpRequestForNGO-${helpRequest.assignedNGO!.userId}`);
+    redis.del(`cache:allHelpRequests-${helpRequest.user.userId}`);
+    redis.del(`cache:activeHelpRequestOfUser-${helpRequest.user.userId}`);
 
     res.status(200).json({
       success: true,

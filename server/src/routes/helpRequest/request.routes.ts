@@ -9,7 +9,7 @@ router.get('/user/:id', getUserHelpRequestById);
 router.get('/ngo-accepted', verifyJWT, getRequestAcceptByNGO);
 router.patch('/accept/ngo', verifyJWT, acceptRequestNGO);
 router.post('/decline/ngo', verifyJWT, declineRequestNGO);
-router.post('/accept/user', acceptRequestUser);
+router.post('/accept/user', verifyJWT, acceptRequestUser);
 router.post('/decline/user', declineRequestUser);
 router.get('/admin-stats', getAdminStats);
 router.delete('/delete/:requestId', verifyJWT, deleteRequest);

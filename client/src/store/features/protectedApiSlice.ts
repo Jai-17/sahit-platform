@@ -30,11 +30,19 @@ export const protectedApiSlice = createApi({
     }),
 
     getActiveHelpRequestDetails: builder.query({
-      query: () => '/api/v1/help/request/active-request-details'
+      query: () => "/api/v1/help/request/active-request-details",
     }),
 
     getHelpRequestCount: builder.query({
       query: () => "/api/v1/help/request/count-requests",
+    }),
+
+    acceptRequestUser: builder.mutation({
+      query: (userData) => ({
+        url: "/api/v1/request/accept/user",
+        method: "POST",
+        body: userData,
+      }),
     }),
 
     createHelpRequest: builder.mutation({
@@ -54,46 +62,46 @@ export const protectedApiSlice = createApi({
 
     startChat: builder.mutation({
       query: (userData) => ({
-        url: '/api/v1/chat/start',
-        method: 'POST',
-        body: userData
-      })
+        url: "/api/v1/chat/start",
+        method: "POST",
+        body: userData,
+      }),
     }),
 
     getMessagesByChatRoomId: builder.query({
       query: (chatRoomId) => ({
-        url: `/api/v1/chat/messages/${chatRoomId}`
-      })
+        url: `/api/v1/chat/messages/${chatRoomId}`,
+      }),
     }),
 
     sendMessage: builder.mutation({
       query: (userData) => ({
-        url: '/api/v1/chat/send',
-        method: 'POST',
-        body: userData
-      })
+        url: "/api/v1/chat/send",
+        method: "POST",
+        body: userData,
+      }),
     }),
 
     updateProfile: builder.mutation({
       query: (userData) => ({
         url: "/api/v1/help/auth/update-user",
         method: "PATCH",
-        body: userData
-      })
+        body: userData,
+      }),
     }),
 
     giveFeedback: builder.mutation({
       query: (userData) => ({
-        url: '/api/v1/help/request/feedback',
-        method: 'POST',
-        body: userData
-      })
+        url: "/api/v1/help/request/feedback",
+        method: "POST",
+        body: userData,
+      }),
     }),
 
     deleteHelpRequest: builder.mutation({
       query: (requestId) => ({
         url: `/api/v1/request/delete/${requestId}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
     }),
   }),
@@ -107,6 +115,7 @@ export const {
   useGetActiveHelpRequestQuery,
   useGetActiveHelpRequestDetailsQuery,
   useGetHelpRequestCountQuery,
+  useAcceptRequestUserMutation,
   useCreateHelpRequestMutation,
   useCreateChatTokenMutation,
   useStartChatMutation,

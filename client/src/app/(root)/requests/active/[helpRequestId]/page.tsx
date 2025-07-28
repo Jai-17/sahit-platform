@@ -27,13 +27,46 @@ import {
 // import ChatInterface from "@/components/common/ChatInterface";
 import TestChat from "@/components/common/TestChat";
 import { useAuth } from "@/lib/hooks/useAuth";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useMarkAsResolvedMutation } from "@/store/features/apiSlice";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   const { data, isLoading } = useGetActiveHelpRequestDetailsQuery(undefined);
+  const [markAsResolved] = useMarkAsResolvedMutation();
+  const router = useRouter();
   const auth = useAuth();
   if (isLoading) return <div>Loading...</div>;
 
   console.log(data?.data);
+
+  async function onSubmit() {
+     try {
+          const res = await markAsResolved({
+            requestId: data?.data?.id
+          }).unwrap();
+    
+          console.log(res);
+          toast.success(res.message);
+          router.push('/');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error:any) {
+          console.error(error);
+          toast.error("Error resolving request:", error.data.message);
+        }
+  }
+
   return (
     <div>
       <div className="flex flex-col md:flex-row md:items-end justify-between">
@@ -46,7 +79,30 @@ const Page = () => {
           </p>
         </div>
         {/* MODALS PAGES */}
-        <div className="flex gap-5 mt-5 md:mt-0">
+        <div className="flex flex-col md:flex-row gap-5 mt-5 md:mt-0">
+          <AlertDialog>
+            <AlertDialogTrigger className="bg-green-600 h-10 px-7 text-white rounded-md hover:bg-green-500 transition duration-200 ease-in cursor-pointer">
+              Mark As Resolved
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Resolve Request?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. Are you sure to resolve the
+                  request?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-green-600 hover:bg-green-500"
+                  onClick={onSubmit}
+                >
+                  Resolve
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Sheet>
             <SheetTrigger className="h-10 px-7 text-xs md:text-base border border-neutral-400 text-neutral-600 rounded-md transition duration-200 ease-in cursor-pointer">
               View NGO
@@ -233,39 +289,35 @@ const Page = () => {
           </div>
         </InfoTab>
       </div>
-      <div
-            className="p-4 space-y-4 bg-white mt-10 rounded-md shadow-lg lg:hidden"
-          >
-            <div className="border rounded-lg p-4">
-              <div className="flex items-center space-x-3">
-                <div>
-                  <p className="font-semibold">
-                    {data.data.assignedNGO.representativeName}
-                    <span className="text-green-500 ml-1">●</span>
-                  </p>
-                  <p className="text-muted-foreground">
-                    {data.data.assignedNGO.representativeTitle}
-                  </p>
-                  <p className="text-muted-foreground">
-                    Typically Available{" "}
-                    {data.data.assignedNGO.representativeAvailability}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="border rounded-lg p-4">
-              <p className="font-semibold mb-2">Your Request Summary</p>
-              <p className="text-muted-foreground">{data.data.description}</p>
-            </div>
-
-            <div className="border rounded-lg p-4">
-              <p className="font-semibold mb-2">Brief About NGO</p>
+      <div className="p-4 space-y-4 bg-white mt-10 rounded-md shadow-lg lg:hidden">
+        <div className="border rounded-lg p-4">
+          <div className="flex items-center space-x-3">
+            <div>
+              <p className="font-semibold">
+                {data.data.assignedNGO.representativeName}
+                <span className="text-green-500 ml-1">●</span>
+              </p>
               <p className="text-muted-foreground">
-                {data.data.assignedNGO.about}
+                {data.data.assignedNGO.representativeTitle}
+              </p>
+              <p className="text-muted-foreground">
+                Typically Available{" "}
+                {data.data.assignedNGO.representativeAvailability}
               </p>
             </div>
           </div>
+        </div>
+
+        <div className="border rounded-lg p-4">
+          <p className="font-semibold mb-2">Your Request Summary</p>
+          <p className="text-muted-foreground">{data.data.description}</p>
+        </div>
+
+        <div className="border rounded-lg p-4">
+          <p className="font-semibold mb-2">Brief About NGO</p>
+          <p className="text-muted-foreground">{data.data.assignedNGO.about}</p>
+        </div>
+      </div>
       <div className="mt-7 bg-white rounded-lg shadow-lg/5 h-[calc(100vh-330px)]">
         <ResizablePanelGroup direction="horizontal">
           {/* LEFT PANEL */}
@@ -309,16 +361,16 @@ const Page = () => {
           <ResizableHandle withHandle />
 
           {/* RIGHT PANEL */}
-          <ResizablePanel
-            defaultSize={55}
-            minSize={40}
-          >
-           {/* <ChatInterface /> */}
-           <TestChat sender={auth.userId!} reciever={data?.data.assignedNGO.userId} />
+          <ResizablePanel defaultSize={55} minSize={40}>
+            {/* <ChatInterface /> */}
+            <TestChat
+              sender={auth.userId!}
+              reciever={data?.data.assignedNGO.userId}
+            />
           </ResizablePanel>
         </ResizablePanelGroup>
 
-          <div className="h-[40px] lg:hidden"></div>
+        <div className="h-[40px] lg:hidden"></div>
       </div>
     </div>
   );

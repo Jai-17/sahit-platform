@@ -36,8 +36,8 @@ const WomenTableCard = ({ women }: { women: Women }) => {
               Help Status:{" "}
             </span>
             <StatusTab
-              title={(women.helpRequests.length > 0 && women.helpRequests[0].staus != "RESOLVED") ? women.helpRequests[0].status : "Inactive"}
-              color={(women.helpRequests.length > 0 && women.helpRequests[0].staus != "RESOLVED") ? "PRIMARY" : "GRAY"}
+              title={(women.helpRequests.length > 0 && women.helpRequests[0]?.status != "RESOLVED") ? women.helpRequests[0].status : "Inactive"}
+              color={(women.helpRequests.length > 0 && women.helpRequests[0].status != "RESOLVED") ? "PRIMARY" : "GRAY"}
             />
           </div>
           <div>

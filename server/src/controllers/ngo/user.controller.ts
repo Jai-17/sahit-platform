@@ -28,12 +28,16 @@ export const getAllNgos = async (
         name: true,
         city: true,
         rating: true,
+        about: true,
         createdAt: true,
         user: {
           select: {
             isAdminApproved: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
@@ -71,7 +75,6 @@ export const getAllNgos = async (
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
-
 
 export const registerNGO = async (
   req: Request,
@@ -161,9 +164,9 @@ export const registerNGO = async (
             state: ngo.state,
             address: ngo.address,
             supportTypes: ngo.supportTypes,
-          }
-        }
-      ])
+          },
+        },
+      ]);
     } catch (error) {
       console.error("Error adding NGO to vector database:", error);
     }
@@ -323,24 +326,45 @@ export const ngoDashboardStat = async (
   }
 };
 
-export const getFeedback = async (req: Request, res: Response):Promise<void> => {
+export const getFeedback = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const queryNGOId = req.query.ngoId;
   const limit = req.params.limit && parseInt(req.params.limit);
-
+  const cacheKey = `cache:ngoFeedback-${queryNGOId}-${limit}`;
   try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log("Returning from cache");
+      res.json(JSON.parse(cached));
+      return;
+    }
+
     const feedback = await prisma.feedback.findMany({
-      where: {ngoId: queryNGOId as string},
+      where: { ngoId: queryNGOId as string },
       orderBy: { createdAt: "desc" },
-      ...(limit && {take: limit})
-    })
+      ...(limit && { take: limit }),
+    });
+
+    await redis.set(
+      cacheKey,
+      JSON.stringify({
+        success: true,
+        message: "Feedback found",
+        data: feedback,
+      }),
+      "EX",
+      300
+    );
 
     res.status(200).json({
       success: true,
       message: "Feedback found",
       data: feedback,
-    })
+    });
   } catch (error) {
     console.error("Error fetching feedback:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
-}
+};

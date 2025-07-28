@@ -129,7 +129,7 @@ export const getActiveHelpRequestDetails = async (
       where: {
         userId: helpSeekerId,
         status: {
-          in: ["IN_PROGRESS", "SEND_TO_NGOS", "DECLINED_BY_ALL"],
+          in: ["IN_PROGRESS", "SEND_TO_NGOS", "DECLINED_BY_ALL", "PENDING"],
         },
       },
       select: {
@@ -237,7 +237,7 @@ export const giveFeedback = async (
       await tx.nGO.update({
         where: { id: ngoId },
         data: {
-          rating: _avg.rating || 0,
+          rating: _avg.rating ? Math.round(_avg.rating * 10) / 10 : 0,
         },
       });
     });
@@ -257,7 +257,7 @@ export const helpSeekerMarkAsResolved = async (
   res: Response
 ): Promise<void> => {
   const { requestId } = req.body;
-
+  console.log("Request ID:", requestId);
   try {
     if (!requestId) {
       res.status(400).json({
@@ -293,6 +293,7 @@ export const helpSeekerMarkAsResolved = async (
 
     const updateData: any = {
       seekerResolved: true,
+      status: "PENDING",
     };
 
     if (helpRequest.ngoResolved) {
@@ -308,6 +309,12 @@ export const helpSeekerMarkAsResolved = async (
       where: { id: requestId },
       data: updateData,
     });
+
+    redis.del(`cache:allActiveHelpRequestForNGO-${helpRequest.assignedNGO!.userId}`);
+    redis.del(`cache:allHelpRequestForNGO-${helpRequest.assignedNGO!.userId}`);
+    redis.del(`cache:allHelpRequests-${helpRequest.user.userId}`);
+    redis.del(`cache:activeHelpRequestOfUser-${helpRequest.user.userId}`);
+
 
     res.status(200).json({
       success: true,

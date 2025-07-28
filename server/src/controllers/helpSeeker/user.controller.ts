@@ -44,6 +44,9 @@ export const getAllHelpSeekers = async (
             isAdminApproved: true,
           }
         }
+      },
+      orderBy: {
+        createdAt: "desc",
       }
     });
 
@@ -110,6 +113,17 @@ export const getHelpSeekerById = async (
             select: {
               isAdminApproved: true,
             },
+          },
+          helpRequests: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              status: true,
+              submittedAt: true,
+            },
+            orderBy: { submittedAt: "desc" },
+            take: 1,
           },
         },
       });

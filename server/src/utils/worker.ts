@@ -95,6 +95,9 @@ const worker = new Worker(
       console.error("❌ Failed to parse LLM response:", response.content);
       matchingNGOs = [];
     }
+    // =================================== LLM MATCHING LOGIC ===================================
+
+
     // const matchingNGOs = await prisma.nGO.findMany({
     //   where: {
     //     supportTypes: { has: request?.helpType },
@@ -146,4 +149,4 @@ const worker = new Worker(
   }
 );
 
-worker.pause();
+// worker.pause();

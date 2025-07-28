@@ -13,7 +13,7 @@ const SentRequestTableCard = ({ data }: { data: HelpRequest }) => {
     <div>
       <div
         onClick={() =>
-          data.status == "IN_PROGRESS"
+          (data.status == "IN_PROGRESS" || data.status == "PENDING")
             ? router.push(`/requests/active/${data.id}`)
             : router.push(`/history/${data.id}`)
         }

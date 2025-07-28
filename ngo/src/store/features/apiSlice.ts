@@ -47,7 +47,15 @@ export const apiSlice = createApi({
                 url: `/api/v1/ngo/user/getUserById/${id}`
             })
         }),
+
+        markAsResolved: builder.mutation({
+            query: (userData) => ({
+                url: '/api/v1/ngo/request/resolve-request',
+                method: 'PATCH',
+                body: userData
+            })
+        })
     })
 })
 
-export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation, useGetIncomingRequestByIdQuery, useGetHelpRequestByIdQuery, useGetNGOByIdQuery } = apiSlice;
+export const { useSignUpMutation, useSignInMutation, useOAuthSyncMutation, useGetIncomingRequestByIdQuery, useGetHelpRequestByIdQuery, useGetNGOByIdQuery, useMarkAsResolvedMutation } = apiSlice;

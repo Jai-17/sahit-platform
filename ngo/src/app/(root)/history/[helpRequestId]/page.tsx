@@ -52,13 +52,13 @@ const Page = () => {
         </div>
         <h1 className="text-xl lg:text-2xl font-semibold mb-5">User Details</h1>
         <div className="flex flex-col md:flex-row gap-5 md:items-center">
-          <IconName name={data.data.user.name} image={data.data.user.photo} />
+          <IconName name={data.data.hideName ? data.data.user.alias : data.data.user.name} image={data.data.hideFace ? "" : data.data.user.photo} />
         </div>
         <div className="flex flex-col lg:flex-row gap-2 mt-7">
             <InfoTab title="Address" value={data.data.user.address} />
             <InfoTab title="City" value={data.data.user.city} />
             <InfoTab title="State" value={data.data.user.state} />
-            <InfoTab title="Age" value={`⭐ ${data.data.user.age}`} />
+            <InfoTab title="Age" value={`${data.data.user.age}`} />
             <InfoTab
               title="Registered On"
               value={format(new Date(data.data.user.createdAt), "PPP")}

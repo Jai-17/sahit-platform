@@ -3,9 +3,9 @@
 
 import Image from "next/image";
 import {
-  useAcceptRequestUserMutation,
   useDeclineRequestUserMutation,
   useGetNGOByIdQuery,
+  useGetNGOFeedbacksQuery,
 } from "@/store/features/apiSlice";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
@@ -27,6 +27,14 @@ import InfoTab from "@/components/common/InfoTab";
 import { format } from "date-fns";
 import { Mail, Phone } from "lucide-react";
 import InfoCard from "@/components/common/InfoCard";
+import { useAcceptRequestUserMutation } from "@/store/features/protectedApiSlice";
+
+interface FeedbackData {
+  id: string;
+  rating: number;
+  content: string;
+  createdAt: string;
+}
 
 const Page = () => {
   // const helpRequestId = params.helpRequestId as string;
@@ -34,9 +42,11 @@ const Page = () => {
   const [acceptRequestUser] = useAcceptRequestUserMutation();
   const [declineRequestUser] = useDeclineRequestUserMutation();
   const { helpRequestId, ngoId } = useParams();
+  const { data: feedbacks, isLoading: isLoadingFeedback } =
+      useGetNGOFeedbacksQuery(ngoId);
   const router = useRouter();
 
-  const { data, isLoading, refetch } = useGetNGOByIdQuery(ngoId);
+  const { data, isLoading } = useGetNGOByIdQuery(ngoId);
   console.log(data);
 
   if (isLoading) return <div>Loading...</div>;
@@ -52,7 +62,7 @@ const Page = () => {
       }).unwrap();
 
       toast.success("User Approved Successfully!");
-      refetch();
+      router.push('/');
     } catch (error: any) {
       toast.error("Error Approving User", error);
     }
@@ -255,6 +265,39 @@ const Page = () => {
             </div>
           </InfoCard>
         </div>
+        <div className="mt-5">
+                  <InfoCard heading="Feedbacks">
+                    {!isLoadingFeedback ? (
+                      feedbacks.data.length > 0 ? (
+                        feedbacks.data.map((feedback: FeedbackData) => (
+                          <div
+                            key={feedback.id}
+                            className="bg-[#F7F8FA] p-5 rounded-lg border border-neutral-200 mt-5"
+                          >
+                            <div className="flex gap-2">
+                              <StatusTab
+                                title={`⭐ ${feedback.rating}`}
+                                color="PRIMARY"
+                              />
+                              <StatusTab
+                                title={`On ${format(
+                                  new Date(feedback.createdAt),
+                                  "PPP"
+                                )}`}
+                                color="GRAY"
+                              />
+                            </div>
+                            <p className="text-lg mt-3">{feedback.content}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <div>No feedbacks yet!</div>
+                      )
+                    ) : (
+                      <div>Loading Feedbacks...</div>
+                    )}
+                  </InfoCard>
+                </div>
       </div>
     </div>
   );
