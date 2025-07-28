@@ -42,7 +42,7 @@ const SentRequestTableCard = ({ data }: { data: HelpRequest }) => {
             <span className="lg:hidden font-semibold text-sm text-black">
               Urgency:{" "}
             </span>
-            <StatusTab title={data?.urgency} color="RED" />
+            <StatusTab title={data?.urgency} color={data?.urgency == "LOW" ? "YELLOW" : data?.urgency == "MEDIUM" ? "ORANGE" : "RED"}  />
           </div>
           <div>
             <span className="lg:hidden font-semibold text-sm text-black">
