@@ -38,7 +38,7 @@ app.use(cors({credentials: true, origin: (origin, callback) => {
     }
 }}));
 
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
     res.json({message: "Server is running!"});
 })
 

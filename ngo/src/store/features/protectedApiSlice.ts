@@ -83,6 +83,14 @@ export const protectedApiSlice = createApi({
       query: (ngoId) => ({
         url: `/api/v1/ngo/user/get-feedbacks?ngoId=${ngoId}`,
       })
+    }),
+
+    sendAwardRequest: builder.mutation({
+      query: (awardData) => ({
+        url: '/api/v1/awards/create',
+        method: 'POST',
+        body: awardData,
+      })
     })
   }),
 });
@@ -100,5 +108,6 @@ export const {
   useUpdateProfileMutation,
   useGetFeedbackQuery,
   useGetAllActiveRequestsQuery,
-  useDeclineIncomingRequestMutation
+  useDeclineIncomingRequestMutation,
+  useSendAwardRequestMutation
 } = protectedApiSlice;

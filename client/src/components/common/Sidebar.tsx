@@ -3,12 +3,12 @@
 import Image from "next/image";
 import React from "react";
 import {
+  AwardIcon,
   HandHeart,
   History,
   Home,
   LogOut,
   MessageSquareDot,
-  Settings,
   User,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -91,11 +91,11 @@ const Sidebar = () => {
 
         <div className="mt-70 lg:mt-80">
           <Link
-            href="/settings"
-            className="flex gap-2 text-sm text-neutral-600 bg-transparent hover:bg-neutral-200 transition px-4 py-3 rounded"
+            href="/apply-award"
+            className={cn("flex gap-2 text-sm transition px-4 py-3 rounded", pathname === '/apply-award' ? 'bg-neutral-200' : 'text-neutral-600 bg-transparent hover:bg-neutral-200')}
           >
-            <Settings size={18} />
-            Settings
+            <AwardIcon size={18} />
+            Awards
           </Link>
           <Link
             href="/logout"

@@ -104,6 +104,14 @@ export const protectedApiSlice = createApi({
         method: "DELETE",
       }),
     }),
+
+    sendAwardRequest: builder.mutation({
+      query: (awardData) => ({
+        url: '/api/v1/awards/create',
+        method: 'POST',
+        body: awardData,
+      })
+    })
   }),
 });
 
@@ -124,4 +132,5 @@ export const {
   useUpdateProfileMutation,
   useGiveFeedbackMutation,
   useDeleteHelpRequestMutation,
+  useSendAwardRequestMutation,
 } = protectedApiSlice;
