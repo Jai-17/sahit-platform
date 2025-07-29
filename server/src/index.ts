@@ -12,6 +12,7 @@ import requestUserRoutes from './routes/helpSeeker/userrequest.routes';
 
 /* ROUTE IMPORTS HELP REQUEST */
 import createRoutes from './routes/helpRequest/request.routes';
+import awardRoutes from './routes/helpRequest/awards.routes'
 
 /* ROUTE IMPORTS NGOS */
 import userNGORoutes from './routes/ngo/user.routes';
@@ -51,6 +52,7 @@ app.use('/api/v1/help/request', requestUserRoutes);
 
 // Help Request Routes
 app.use('/api/v1/request', createRoutes);
+app.use('/api/v1/awards', awardRoutes);
 
 // NGO Request Routes
 app.use('/api/v1/ngo/user', userNGORoutes);

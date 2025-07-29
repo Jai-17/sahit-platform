@@ -23,6 +23,7 @@ model User {
 
   ngo        NGO?
   helpSeeker HelpSeeker?
+  awards     Awards?
 
   isOnboarded     Boolean   @default(false)
   isVerified      Boolean   @default(false)
@@ -143,6 +144,19 @@ model HelpRequestNGOStatus {
   @@unique([helpRequestId, ngoId])
 }
 
+model Awards {
+  id String @id @default(uuid())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id])
+  roleId String
+  role UserRole
+  workDone String
+  reason String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status AwardStatus @default(PENDING)
+}
+
 enum NGOHelpStatus {
   PENDING
   ACCEPTED
@@ -155,6 +169,14 @@ enum HelpType {
   COUNSELLING
   FINANCIAL
   OTHER
+}
+
+enum AwardStatus {
+  PENDING
+  STAGE_1_APPROVED
+  STAGE_2_APPROVED
+  NOMINATED
+  DECLINED
 }
 
 enum HelpUrgency {

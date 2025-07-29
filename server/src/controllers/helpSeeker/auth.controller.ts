@@ -5,8 +5,6 @@ import { addMinutes } from "date-fns";
 import { sendVerificationEmail } from "../../utils/email.config";
 import { generateAccessToken, generateRefreshToken } from "../../utils/token";
 import jwt from "jsonwebtoken";
-import { config } from "dotenv";
-config();
 
 import { OAuth2Client } from "google-auth-library";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);

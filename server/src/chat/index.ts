@@ -1,7 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import {config} from 'dotenv';
 import { SupabaseClient } from "@supabase/supabase-js";
-config();
 
 const chatClient = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE!, {
     auth: {

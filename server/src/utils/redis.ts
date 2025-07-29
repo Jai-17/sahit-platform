@@ -1,8 +1,8 @@
 import Redis from "ioredis";
-import { config } from "dotenv";
-config();
 
-const redis = new Redis(process.env.REDIS_URL!, {
+const redis = new Redis({
+    host: "localhost",
+    port: 6379,
     maxRetriesPerRequest: null,
     enableReadyCheck: false
 });
