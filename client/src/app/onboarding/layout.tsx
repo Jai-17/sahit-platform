@@ -15,7 +15,7 @@ const OnboardingLayout = ({ children }: { children: ReactNode }) => {
     redirect('/');
   }
 
-  if(!user.accessToken && !user.isVerified) {
+  if(!user.accessToken || !user.isVerified) {
     redirect('/sign-in');
   }
 

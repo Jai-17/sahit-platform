@@ -93,8 +93,12 @@ const AuthForm = ({ type }: { type: FormType }) => {
         "Something went wrong. Please try again.";
       toast.error(`There was an error: ${msg}`);
     }
-
-    if (store.getState().auth.user!.isOnboarded) {
+    if (
+      store.getState().auth.user!.isOnboarded &&
+      store.getState().auth.user!.isAdminApproved
+    ) {
+      return redirect("/");
+    } else if (store.getState().auth.user!.isOnboarded) {
       console.log("ISONBOARDED GOING IN VERIFY", user.isOnboarded);
       return redirect("/onboarding/verify");
     } else {

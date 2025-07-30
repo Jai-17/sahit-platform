@@ -11,7 +11,7 @@ import {
 import { HelpType, onboardingSchema } from "@/lib/schema";
 import { useOnboardingForm } from "@/store/OnboardingFormContext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useGetUserQuery } from "@/store/features/protectedApiSlice";
 
 const detailsSchema = onboardingSchema.pick({
   replyTimeMins: true,
@@ -39,6 +40,7 @@ const detailsSchema = onboardingSchema.pick({
 
 const DetailsPage = () => {
   const router = useRouter();
+  const { data: user, isLoading } = useGetUserQuery(undefined);
   const { data, setData } = useOnboardingForm();
   const form = useForm<z.infer<typeof detailsSchema>>({
     resolver: zodResolver(detailsSchema),
@@ -57,6 +59,11 @@ const DetailsPage = () => {
       representativeTitle: "",
     },
   });
+
+  if (!isLoading && user?.data.isOnboarded) {
+    console.log(user?.data.isOnboarded);
+    redirect('/onboarding/verify');
+  }
 
   const { watch, setValue } = form;
   const whatsappSame = watch("whatsappSame");
@@ -145,24 +152,24 @@ const DetailsPage = () => {
               <MultiSelectDropdown />
               <div className="w-full max-w-md">
                 <FormField
-                control={form.control}
-                name="about"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Brief About of your NGO</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        rows={4}
-                        wrap="soft"
-                        placeholder="Tell us a little bit about yourself"
-                        className="resize-y w-full text-sm md:text-base overflow-hidden break-words whitespace-pre-line"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              ></FormField>
+                  control={form.control}
+                  name="about"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Brief About of your NGO</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={4}
+                          wrap="soft"
+                          placeholder="Tell us a little bit about yourself"
+                          className="resize-y w-full text-sm md:text-base overflow-hidden break-words whitespace-pre-line"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                ></FormField>
               </div>
               <div className="flex gap-4">
                 <CustomFormField

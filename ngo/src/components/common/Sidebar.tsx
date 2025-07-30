@@ -41,7 +41,12 @@ const Sidebar = () => {
 
   function handleLogout() {
     dispatch(clearAuth());
-    persistor.purge();
+    persistor.pause(); 
+    persistor.flush().then(() => {
+      persistor.purge();
+      localStorage.removeItem("persist:root");
+      window.location.reload();
+    });
   }
 
   return (

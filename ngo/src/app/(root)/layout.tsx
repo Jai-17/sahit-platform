@@ -17,7 +17,8 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
     isAdminApproved: user.isAdminApproved,
   });
 
-  if (!user.accessToken && !user.isVerified && user.role != "NGO") {
+  if (!user.accessToken || !user.isVerified || user.role != "NGO") {
+    console.log('Yeah i execute');
     redirect('/sign-in')
   }
 
@@ -28,7 +29,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
   if(!user.isAdminApproved) {
     redirect('/onboarding/verify');
   }
-
+  
   return (
     <div className="flex h-screen bg-[#F7F8FA]">
       <Sidebar />

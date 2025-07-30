@@ -17,7 +17,7 @@ const MainLayout = ({ children }: { children: ReactNode }) => {
     isAdminApproved: user.isAdminApproved,
   });
 
-  if (!user.accessToken && !user.isVerified && user.role != "HELP_SEEKER") {
+  if (!user.accessToken || !user.isVerified || user.role != "HELP_SEEKER") {
     redirect('/sign-in')
   }
 

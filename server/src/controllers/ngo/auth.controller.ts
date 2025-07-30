@@ -261,7 +261,7 @@ export const oauthSync = async (req: Request, res: Response): Promise<void> => {
 
     const { email, name } = payload;
 
-    let user = await prisma.user.findUnique({ where: { email } });
+    let user = await prisma.user.findUnique({ where: { email }, include: {ngo: {select: {id: true}}} });
     if (!user) {
       user = await prisma.user.create({
         data: {
@@ -273,6 +273,7 @@ export const oauthSync = async (req: Request, res: Response): Promise<void> => {
           otpExpiry: null,
           isVerified: true,
         },
+        include: { ngo: { select: { id: true } } }
       });
     }
 
@@ -282,6 +283,7 @@ export const oauthSync = async (req: Request, res: Response): Promise<void> => {
       isVerified: user.isVerified,
       role: user.role,
       isAdminApproved: user.isAdminApproved,
+      roleId: user.ngo?.id,
       userName: user.name,
       email: user.email,
     });
@@ -290,6 +292,7 @@ export const oauthSync = async (req: Request, res: Response): Promise<void> => {
       isOnboarded: user.isOnboarded,
       isVerified: user.isVerified,
       role: user.role,
+      roleId: user.ngo?.id,
       isAdminApproved: user.isAdminApproved,
       userName: user.name,
       email: user.email,

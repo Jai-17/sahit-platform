@@ -194,6 +194,7 @@ export const getNGOById = async (
       select: {
         name: true,
         replyTimeMins: true,
+        userId: true,
         supportTypes: true,
         address: true,
         city: true,

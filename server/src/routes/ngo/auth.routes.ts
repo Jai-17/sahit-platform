@@ -10,7 +10,7 @@ router.get('/verify-otp', verifyEmail);
 router.post('/resend-otp', resendOtp);
 router.post('/oauth-sync', oauthSync);
 router.post('/refresh-token', refreshAccessToken);
-router.get('/getuser', getUser);
+router.get('/getuser', verifyJWT, getUser);
 router.patch('/update-user', verifyJWT, updateNGOProfile);
 
 export default router;
