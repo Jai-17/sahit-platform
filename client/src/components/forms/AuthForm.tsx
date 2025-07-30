@@ -21,7 +21,7 @@ import GoogleLoginButton from "../ui/googleLogin";
 import { store } from "@/store/store";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { useCreateChatTokenMutation } from "@/store/features/protectedApiSlice";
-import { setSupabaseAuthToken } from "@/lib/chat";
+// import { setSupabaseAuthToken } from "@/lib/chat";
 
 const authFormSchema = (type: FormType) => {
   return z.object({
@@ -95,7 +95,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           console.log('⭐⭐⭐ SUPABASE TOKEN DATA IS WHAT',supabaseTokenData);
           const supabaseJwt = supabaseTokenData.supabase_jwt;
           console.log(supabaseJwt);
-          setSupabaseAuthToken(supabaseJwt);
+          // setSupabaseAuthToken(supabaseJwt);
           console.log('Supabase JWT successfully set on client.');
         } catch (tokenError) {
           console.error('Error Supabase JWT via RTK Query:', tokenError);

@@ -77,6 +77,10 @@ export const apiSlice = createApi({
         url: `/api/v1/ngo/user/get-feedbacks?ngoId=${ngoId}&limit=5`,
       }),
     }),
+
+    getAllNGOs: builder.query({
+      query: () => `api/v1/ngo/user/get-ngos?detail`,
+    }),
   }),
 });
 
@@ -90,5 +94,6 @@ export const {
   useGetHelpRequestByIdQuery,
   useDeclineRequestUserMutation,
   useMarkAsResolvedMutation,
-  useGetNGOFeedbacksQuery
+  useGetNGOFeedbacksQuery,
+  useGetAllNGOsQuery,
 } = apiSlice;

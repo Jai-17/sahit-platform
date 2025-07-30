@@ -191,3 +191,20 @@ export const changeAwardStatus = async (
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
+
+export const getAwardStatusById = async (req: Request, res: Response): Promise<void> => {
+  const userId = req.user?.userId;
+
+  try {
+    const status = await prisma.awards.findUnique({where: {userId}, select:{status: true}});
+    if(!status) {
+      res.status(404).json({success: false, message: "No award status found"});
+      return;
+    }
+
+    res.status(200).json({success: true, message: "Found Award Status", data: status});
+  } catch (error) {
+    console.error('Error getting status', error);
+    res.status(500).json({success: false, message: "Internal Server Error!"});
+  }
+}

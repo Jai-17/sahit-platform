@@ -15,8 +15,10 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store"
+import { persistor, RootState } from "@/store/store";
 import { closeMobileNav } from "@/store/features/NavigationSlice";
+import { Button } from "../ui/button";
+import { clearAuth } from "@/store/features/authSlice";
 
 const navItems = [
   { label: "Home", path: "/", icon: <Home size={18} /> },
@@ -26,7 +28,7 @@ const navItems = [
     icon: <MessageSquareDot size={18} />,
   },
   { label: "History", path: "/history", icon: <History size={18} /> },
-  {label: "Feedbacks", path: "/feedbacks", icon: <Star size={18} />},
+  { label: "Feedbacks", path: "/feedbacks", icon: <Star size={18} /> },
   { label: "Profile", path: "/profile", icon: <User size={18} /> },
 ];
 
@@ -36,6 +38,11 @@ const Sidebar = () => {
   const isMobileNavOpen = useSelector(
     (state: RootState) => state.navigation.isMobileNavOpen
   );
+
+  function handleLogout() {
+    dispatch(clearAuth());
+    persistor.purge();
+  }
 
   return (
     <>
@@ -88,18 +95,24 @@ const Sidebar = () => {
         <div className="mt-70 lg:mt-80">
           <Link
             href="/apply-award"
-            className={cn("flex gap-2 text-sm transition px-4 py-3 rounded", pathname === '/apply-award' ? 'bg-neutral-200' : 'text-neutral-600 bg-transparent hover:bg-neutral-200')}
+            className={cn(
+              "flex gap-2 text-sm transition px-4 py-3 rounded",
+              pathname === "/apply-award"
+                ? "bg-neutral-200"
+                : "text-neutral-600 bg-transparent hover:bg-neutral-200"
+            )}
           >
             <Award size={18} />
             Awards
           </Link>
-          <Link
-            href="/logout"
-            className="flex gap-2 mt-6 text-sm text-neutral-600 bg-transparent hover:bg-neutral-200 transition px-4 py-3 rounded"
+          <Button
+            type="button"
+            onClick={handleLogout}
+            className="flex gap-2 mt-6 w-full justify-baseline cursor-pointer text-sm text-neutral-600 bg-transparent hover:bg-neutral-200 transition px-4 py-3 rounded"
           >
-            <LogOut size={18} />
+            <LogOut size={18} className="ml-2" />
             Logout
-          </Link>
+          </Button>
         </div>
       </div>
     </>

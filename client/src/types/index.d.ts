@@ -17,6 +17,30 @@ interface SignInData {
     password: string;
 }
 
+interface NGO {
+    id: string;
+    name: string;
+    supportTypes: string[];
+    address: string;
+    city: string;
+    state: string;
+    rating: number;
+    createdAt: DateTime;
+    email: string;
+    whatsappSame: boolean;
+    resolvedHelpRequestCount: number;
+    phone: string;
+    whatsappNumber: string;
+    about: string;
+    representativeName: string;
+    representativeTitle: string;
+    representativeAvailability: string;
+    verifiedDocs: string[];
+    userId: string;
+    user: {isAdminApproved: boolean};
+    totalHelped?: number;
+}
+
 interface User {
     id: string;
     name: string;

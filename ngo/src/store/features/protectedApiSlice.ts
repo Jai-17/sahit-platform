@@ -91,7 +91,11 @@ export const protectedApiSlice = createApi({
         method: 'POST',
         body: awardData,
       })
-    })
+    }),
+
+    getAwardStatus: builder.query({
+      query: () => '/api/v1/awards/status',
+    }) 
   }),
 });
 
@@ -109,5 +113,6 @@ export const {
   useGetFeedbackQuery,
   useGetAllActiveRequestsQuery,
   useDeclineIncomingRequestMutation,
-  useSendAwardRequestMutation
+  useSendAwardRequestMutation,
+  useGetAwardStatusQuery,
 } = protectedApiSlice;

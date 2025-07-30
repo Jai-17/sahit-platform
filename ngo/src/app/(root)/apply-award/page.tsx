@@ -14,7 +14,10 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "@/components/ui/button";
-import { useSendAwardRequestMutation } from "@/store/features/protectedApiSlice";
+import {
+  useGetAwardStatusQuery,
+  useSendAwardRequestMutation,
+} from "@/store/features/protectedApiSlice";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -26,6 +29,8 @@ const awardFormSchema = z.object({
 const Page = () => {
   const router = useRouter();
   const [sendAwardRequest] = useSendAwardRequestMutation();
+  const { data } = useGetAwardStatusQuery(undefined);
+
   const form = useForm<z.infer<typeof awardFormSchema>>({
     resolver: zodResolver(awardFormSchema),
     defaultValues: {
@@ -44,13 +49,27 @@ const Page = () => {
       toast.error(`Error submitting application: ${error.data.message}`);
     }
   }
-
+  const status = data?.data.status;
   return (
     <div>
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl md:text-4xl font-semibold">
-          Apply for Sahit Awards 🏆
-        </h1>
+        <div className="flex items-center">
+          <h1 className="text-2xl md:text-4xl font-semibold">
+            Apply for Sahit Awards 🏆
+          </h1>
+          {status && <p
+            className={`
+        ${status === "DECLINED" ? "text-red-600 bg-red-100" : ""}
+        ${status === "PENDING" ? "text-yellow-600 bg-yellow-100" : ""}
+        ${status === "STAGE_1_APPROVED" ? "text-blue-600 bg-blue-100" : ""}
+        ${status === "STAGE_2_APPROVED" ? "text-indigo-600 bg-indigo-100" : ""}
+        ${status === "NOMINATED" ? "text-green-600 bg-green-100" : ""}
+        capitalize py-1 px-2 rounded-lg text-lg ml-2 font-semibold
+      `}
+          >
+            Award Status: {status?.toLowerCase()}
+          </p>}
+        </div>
         <p className="bg-purple-100 p-4 text-center my-3 rounded-lg md:text-lg font-medium text-purple-950">
           We honor women and NGOs who have made a meaningful impact in their
           communities or fields of work. Whether you&apos;ve championed change,

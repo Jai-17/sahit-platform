@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "./FormField";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   useSignInMutation,
@@ -61,7 +61,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(type);
     try {
-
       // SIGN UP LOGIC
       if (type === "sign-up") {
         await signUp({
@@ -72,9 +71,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
         toast.success("Signed up Successfully");
         router.push("/sign-in");
-
       } else {
-
         // SIGN IN LOGIC
         const res = await signIn({
           email: values.email,
@@ -84,21 +81,25 @@ const AuthForm = ({ type }: { type: FormType }) => {
         const decode = jwtDecode<TokenPayload>(res.accessToken);
         dispatch(setUser(decode));
         console.log("Auth from Redux:", store.getState().auth);
+        console.log(store.getState().auth);
         toast.success("Signed in Successfully");
-        if (user.isOnboarded) {
-          console.log('ISONBOARDED', user.isOnboarded);
-          router.push("/onboarding/verify");
-        } else {
-          console.log('ISONBOARDED', user.isOnboarded);
-          router.push("/onboarding/details");
-        }
-
       }
-
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.log(error);
-      toast.error(`There was an error: ${error.data.message}`);
+      console.error(error);
+      const msg =
+        error?.data?.message ||
+        error?.message ||
+        "Something went wrong. Please try again.";
+      toast.error(`There was an error: ${msg}`);
+    }
+
+    if (store.getState().auth.user!.isOnboarded) {
+      console.log("ISONBOARDED GOING IN VERIFY", user.isOnboarded);
+      return redirect("/onboarding/verify");
+    } else {
+      console.log("ISONBOARDED GOING IN DETAILS", user.isOnboarded);
+      return redirect("/onboarding/details");
     }
   }
 

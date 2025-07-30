@@ -15,8 +15,10 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import { persistor, RootState } from "@/store/store";
 import { closeMobileNav } from "@/store/features/NavigationSlice";
+import { Button } from "../ui/button";
+import { clearAuth } from "@/store/features/authSlice";
 
 const navItems = [
   { label: "Home", path: "/", icon: <Home size={18} /> },
@@ -27,8 +29,8 @@ const navItems = [
   },
   { label: "History", path: "/history", icon: <History size={18} /> },
   {
-    label: "NGO Initiatives",
-    path: "/ngo-initiatives",
+    label: "NGOs",
+    path: "/ngos",
     icon: <HandHeart size={18} />,
   },
   { label: "Profile", path: "/profile", icon: <User size={18} /> },
@@ -40,6 +42,11 @@ const Sidebar = () => {
   const isMobileNavOpen = useSelector(
     (state: RootState) => state.navigation.isMobileNavOpen
   );
+
+  function handleLogout() {
+    dispatch(clearAuth());
+    persistor.purge();
+  }
 
   return (
     <>
@@ -97,13 +104,14 @@ const Sidebar = () => {
             <AwardIcon size={18} />
             Awards
           </Link>
-          <Link
-            href="/logout"
-            className="flex gap-2 mt-6 text-sm text-neutral-600 bg-transparent hover:bg-neutral-200 transition px-4 py-3 rounded"
+          <Button
+            type="button"
+            onClick={handleLogout}
+            className="flex gap-2 mt-6 w-full justify-baseline cursor-pointer text-sm text-neutral-600 bg-transparent hover:bg-neutral-200 transition px-4 py-3 rounded"
           >
-            <LogOut size={18} />
+            <LogOut size={18} className="ml-2" />
             Logout
-          </Link>
+          </Button>
         </div>
       </div>
     </>
