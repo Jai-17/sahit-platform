@@ -128,7 +128,8 @@ export const columns = ({ onSelect }: ColumnsOptions): ColumnDef<Awards>[] => [
     cell: ({ row }) => <div>{row.original.id.slice(0, 8)}</div>,
   },
   {
-    accessorKey: "username",
+    id: "username",
+    accessorFn: (row) => row.user.name,
     header: "Name",
     cell: ({ row }) => <div>{row.original.user.name}</div>,
   },

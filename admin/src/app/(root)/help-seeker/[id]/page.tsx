@@ -60,19 +60,20 @@ const Page = () => {
         userId: data.data.userId,
       }).unwrap();
 
-      toast.success("NGO Approved Successfully!");
+      toast.success("User Approved Successfully!");
       refetch();
     } catch (error: any) {
       toast.error("Error Approving NGO", error);
     }
   }
 
-  async function onAssign(ngoId: string, requestId: string) {
-    console.log(ngoId, requestId);
+  async function onAssign(ngoId: string, requestId: string, roleId: string) {
+    console.log(ngoId, requestId, roleId);
     try {
       await assignRequestToNGO({
         ngoId,
         requestId,
+        roleId,
       }).unwrap();
 
       toast.success("NGO Assigned Successfully!");
@@ -151,7 +152,7 @@ const Page = () => {
                       <StatusTab title={`⭐ ${ngo.rating}`} color="GRAY" />
                       <Button
                         onClick={() =>
-                          onAssign(ngo.id, data.data.helpRequests[0].id)
+                          onAssign(ngo.id, data.data.helpRequests[0].id, data?.data.id)
                         }
                         className="bg-[#8300EA] hover:bg-[#8300EA90]"
                       >

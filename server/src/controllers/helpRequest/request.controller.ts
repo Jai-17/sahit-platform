@@ -404,6 +404,51 @@ export const acceptRequestUser = async (
   }
 };
 
+export const assignRequestByAdmin = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const ngoId = req.body.ngoId;
+  const helpRequestId = req.body.requestId;
+  const roleId = req.body.roleId;
+  try {
+    // 1. Assign the ngo to HelpRequestTable and update status
+    await prisma.helpRequest.update({
+      where: { id: helpRequestId },
+      data: {
+        assignedNGO: {
+          connect: { id: ngoId },
+        },
+        status: "IN_PROGRESS",
+        requestedNGOs: {
+          set: [{ id: ngoId }],
+        },
+      },
+    });
+
+    // 2. Delete other ngo status
+    await prisma.helpRequestNGOStatus.deleteMany({
+      where: {
+        helpRequestId,
+      },
+    });
+
+    redis.del(`cache:allActiveHelpRequestForNGO-${ngoId}`);
+    redis.del(`cache:incomingRequests-${ngoId}`);
+    redis.del(`cache:activeHelpRequestOfUser-${roleId}`);
+    redis.del(`cache:allHelpRequests-${roleId}`);
+    redis.del(`cache:requestAcceptedByNGOForUser-${roleId}`);
+    
+    res.status(200).json({
+      success: true,
+      message: "Help Request Successfully assigned to NGO",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 export const declineRequestUser = async (
   req: Request,
   res: Response

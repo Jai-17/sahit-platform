@@ -55,7 +55,7 @@ export const apiSlice = createApi({
 
     assignRequestToNGO: builder.mutation({
       query: (userData) => ({
-        url: "/api/v1/request/accept/user",
+        url: "/api/v1/request/accept/assign-admin",
         method: "POST",
         body: userData,
       }),

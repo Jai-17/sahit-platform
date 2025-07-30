@@ -178,7 +178,7 @@ const TestChat = ({
   if (startChatError || historicalMessagesError || sendMessageError) {
     return (
       <div className="flex items-center justify-center h-full text-red-600">
-        Error loading chat
+        Error loading chat, Try Refreshing.
       </div>
     );
   }
