@@ -5,7 +5,7 @@ import { verifyJWT } from '../../middleware/auth';
 const router = Router();
 
 router.post('/create', verifyJWT, createAward);
-router.get('/getAll/:role', getAwardsByRole);
+router.get('/getAll', getAwardsByRole);
 router.get('/getAward/:id', getAwardDetailsById);
 router.patch('/update/:id', changeAwardStatus);
 

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import React from "react";
 import {
+  AwardIcon,
   HandHeart,
   HeartHandshake,
   Home,
@@ -24,6 +25,7 @@ const navItems = [
     icon: <HandHeart size={18} />,
   },
   { label: "Help Seeker", path: "/help-seeker", icon: <HeartHandshake size={18} /> },
+  {label: "Awards", path: "/awards", icon: <AwardIcon size={18} />}
 ];
 
 const Sidebar = () => {
