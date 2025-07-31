@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import redis from "../../utils/redis";
 import { prisma } from "../../db";
 import { qdrantVectorStore } from "../../utils/qdrant";
+import { sendNGOApprovalEmail } from "../../utils/email.config";
 
 export const getAllNgos = async (
   req: Request,
@@ -263,6 +264,9 @@ export const approveNGO = async (
       where: { id: userId },
       data: { isAdminApproved: true },
     });
+
+    sendNGOApprovalEmail(updatedUser.name, updatedUser.email);
+
     res.status(200).json({
       success: true,
       message: "User Admin Approved Successfully",

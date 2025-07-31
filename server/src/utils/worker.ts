@@ -43,6 +43,10 @@ const worker = new Worker(
       await qdrantVectorStore.similaritySearchVectorWithScore(queryVector, 20);
     console.log("Qdrant Results", qdrantResults);
 
+    qdrantResults.forEach(([doc], i) => {
+      console.log(doc.metadata);
+    });
+
     const ngoInfoList = qdrantResults.map(([doc], i) => ({
       id: doc.metadata.id,
       name: doc.metadata.name,
@@ -51,6 +55,8 @@ const worker = new Worker(
       supportTypes: doc.metadata.supportTypes,
       about: doc.pageContent,
     }));
+
+    console.log(ngoInfoList);
 
     const formattedPrompt = `
     A person in "${helpLocation}" needs help with "${helpType}". Their help request is:
@@ -67,13 +73,15 @@ const worker = new Worker(
       )
       .join("\n\n")}
 
-    Please return a JSON array of the 3 most relevant NGO IDs. 
+    Please return a JSON array of atmost 3 most relevant NGO IDs. 
     Pick NGOs that:
     - Match the help type: "${helpType}"
     - Are close to "${helpLocation}" (even nearby cities)
     - Are relevant based on their description
 
-    Only return the JSON array of IDs. Example: ["abc123", "def456", "ghi789"]`;
+    Only return the JSON array of IDs which should containe the ids in UID format, don't return undefined. Example: ["abc123", "def456", "ghi789"]`;
+
+    console.log(formattedPrompt);
 
     const response = await llm.invoke(formattedPrompt);
 
@@ -97,7 +105,6 @@ const worker = new Worker(
     }
     // =================================== LLM MATCHING LOGIC ===================================
 
-
     // const matchingNGOs = await prisma.nGO.findMany({
     //   where: {
     //     supportTypes: { has: request?.helpType },
@@ -112,6 +119,8 @@ const worker = new Worker(
     // console.log("Sending Mails to NGOs");
 
     // Send Mails to NGO
+
+    console.log("Matching NGOS", matchingNGOs);
 
     if (matchingNGOs.length > 0) {
       await prisma.helpRequest.update({

@@ -7,11 +7,28 @@ import { Clock, MapPin } from "lucide-react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { formatTimeAgo } from "@/lib/utils";
+import { useAcceptRequestUserMutation } from "@/store/features/protectedApiSlice";
+import { toast } from "sonner";
 
 const IncomingRequestCard = ({data}:any) => {
   const router = useRouter();
+  const [acceptRequestUser] = useAcceptRequestUserMutation();
   const timeAgo = formatTimeAgo(data.updatedAt)
   console.log('COMING FROM INCMOING REQUEST CARD', data);
+
+  async function onSubmit() {
+      try {
+        await acceptRequestUser({
+          ngoId: data.ngo.id,
+          requestId: data.helpRequestId,
+        }).unwrap();
+  
+        toast.success("User Approved Successfully!");
+        router.push('/');
+      } catch (error: any) {
+        toast.error("Error Approving User", error);
+      }
+    }
 
   return (
     <div className="flex flex-col bg-white drop-shadow-md rounded-xl p-7 gap-4">
@@ -38,7 +55,7 @@ const IncomingRequestCard = ({data}:any) => {
       </div>
       {data.ngo.supportTypes.length > 0 ? (<div className="flex gap-2">{data.ngo.supportTypes.map((data:any) => <StatusTab title={data} key={data} color="WHITE" />)}</div>) : (<div></div>)}
       <div className="flex gap-2 mt-1">
-        <Button className="bg-[#8300EA] h-10 px-7 hover:bg-[#8300EA90] transition duration-200 ease-in cursor-pointer">
+        <Button onClick={onSubmit} className="bg-[#8300EA] h-10 px-7 hover:bg-[#8300EA90] transition duration-200 ease-in cursor-pointer">
           Accept
         </Button>
         <Button

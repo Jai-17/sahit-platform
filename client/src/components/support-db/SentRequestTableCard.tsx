@@ -30,7 +30,7 @@ const SentRequestTableCard = ({ data }: { data: HelpRequest }) => {
             <span className="lg:hidden font-semibold text-sm text-black">
               NGO Name:{" "}
             </span>
-            {data.status === "SEND_TO_NGOS" ? "Not Assigned Yet" : data?.assignedNGO.name}
+            {(data.status === "SEND_TO_NGOS" || data.status === "PENDING") ? "Not Assigned Yet" : data?.assignedNGO?.name}
           </p>
           <p>
             <span className="lg:hidden font-semibold text-sm text-black">

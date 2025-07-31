@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../../db";
 import redis from "../../utils/redis";
+import { sendUserApprovedByAdminEmail } from "../../utils/email.config";
 
 export const getAllHelpSeekers = async (
   req: Request,
@@ -184,6 +185,9 @@ export const approveHelpSeeker = async (
       where: { id: userId },
       data: { isAdminApproved: true },
     });
+
+    sendUserApprovedByAdminEmail(updatedUser.name, updatedUser.email);
+
     res.status(200).json({
       success: true,
       message: "User Admin Approved Successfully",

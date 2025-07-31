@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../../db";
 import { queue } from "../../utils/worker";
 import redis from "../../utils/redis";
+import { sendHelpRequestApprovalByNGOEmail, sendNgoMatchConfirmedEmail } from "../../utils/email.config";
 
 export const createRequest = async (
   req: Request,
@@ -225,6 +226,23 @@ export const acceptRequestNGO = async (
       data: {
         status: "ACCEPTED",
       },
+      include: {
+        ngo: {
+          select: {
+            name: true,
+          }
+        },
+        helpRequest: {
+          select: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              }
+            }
+          }
+        }
+      }
     });
 
     if (!updatedRequest) {
@@ -233,6 +251,8 @@ export const acceptRequestNGO = async (
         .json({ success: false, message: "No help request exists" });
       return;
     }
+
+    sendHelpRequestApprovalByNGOEmail(updatedRequest.helpRequest.user.name, updatedRequest.helpRequest.user.email!, updatedRequest.ngo.name)
 
     res.status(200).json({
       success: true,
@@ -368,7 +388,7 @@ export const acceptRequestUser = async (
   const roleId = req.user.roleId;
   try {
     // 1. Assign the ngo to HelpRequestTable and update status
-    await prisma.helpRequest.update({
+    const updatedHelpRequest = await prisma.helpRequest.update({
       where: { id: helpRequestId },
       data: {
         assignedNGO: {
@@ -379,6 +399,20 @@ export const acceptRequestUser = async (
           set: [{ id: ngoId }],
         },
       },
+      include: {
+        assignedNGO: {
+          select: {
+            name: true,
+            email: true,
+          }
+        },
+        user: {
+          select: {
+            name: true,
+            id: true,
+          }
+        }
+      }
     });
 
     // 2. Delete other ngo status
@@ -392,7 +426,9 @@ export const acceptRequestUser = async (
     redis.del(`cache:incomingRequests-${ngoId}`);
     redis.del(`cache:activeHelpRequestOfUser-${roleId}`);
     redis.del(`cache:allHelpRequests-${roleId}`);
-    redis.del(`cache:requestAcceptedByNGOForUser-${roleId}`);
+    redis.del(`cache:requestAcceptedByNGOForUser-${updatedHelpRequest.user.id}`);
+
+    sendNgoMatchConfirmedEmail(updatedHelpRequest.assignedNGO!.email, updatedHelpRequest.assignedNGO!.name, updatedHelpRequest.user.name, updatedHelpRequest.id);
     
     res.status(200).json({
       success: true,
