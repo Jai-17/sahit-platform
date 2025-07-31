@@ -30,13 +30,7 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({policy: "cross-origin"}));
 app.use(morgan("common"));
-app.use(cors({credentials: true, origin: (origin, callback) => {
-    if(!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-    } else {
-        callback(new Error('Now allowed by CORS'));
-    }
-}}));
+app.use(cors({origin: true, credentials: true}));
 
 app.get("/", (_, res) => {
     res.json({message: "Server is running!"});
