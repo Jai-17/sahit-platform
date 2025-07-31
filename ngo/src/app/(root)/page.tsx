@@ -26,8 +26,6 @@ const Page = () => {
           <StatsCard
             title="Active Request"
             statNumber={data?.activeRequests}
-            progress={true}
-            progressNumber={3}
             icon={<BellIcon size={40} />}
           />
         </div>
@@ -35,8 +33,6 @@ const Page = () => {
           <StatsCard
             title="New Request"
             statNumber={data?.newRequests}
-            progress={true}
-            progressNumber={3}
             icon={<CheckCircle size={40} />}
           />
         </div>
@@ -44,8 +40,6 @@ const Page = () => {
           <StatsCard
             title="Total Helped"
             statNumber={data?.totalHelped}
-            progress={true}
-            progressNumber={3}
             icon={<PlusCircle size={40} />}
           />
         </div>
