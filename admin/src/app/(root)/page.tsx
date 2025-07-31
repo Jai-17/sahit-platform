@@ -3,7 +3,7 @@
 import HomeLoader from "@/components/loaders/HomeLoader";
 import StatsCard from "@/components/StatsCard";
 import { useGetDBStatsQuery } from "@/store/features/apiSlice";
-import { CheckCircle } from "lucide-react";
+import { BadgePlus, CheckCircle, HandHeart, HeartHandshake, Loader, ShieldAlert, Venus } from "lucide-react";
 import React from "react";
 
 const HomePage = () => {
@@ -31,30 +31,22 @@ const HomePage = () => {
           <StatsCard
             title="Active NGOs"
             statNumber={data?.activeNGOsCount}
-            progress={true}
-            progressNumber={3}
-            icon={<CheckCircle size={40} />}
+            icon={<HeartHandshake size={40} />}
           />
           <StatsCard
             title="Active Requests"
             statNumber={data?.activeRequestsCount}
-            progress={true}
-            progressNumber={3}
             icon={<CheckCircle size={40} />}
           />
           <StatsCard
             title="Total Helped"
             statNumber={data?.totalHelpedCount}
-            progress={true}
-            progressNumber={3}
-            icon={<CheckCircle size={40} />}
+            icon={<HandHeart size={40} />}
           />
           <StatsCard
             title="Inactive NGOs"
             statNumber={data?.inactiveNGOsCount}
-            progress={true}
-            progressNumber={3}
-            icon={<CheckCircle size={40} />}
+            icon={<ShieldAlert size={40} />}
           />
         </div>
       </div>
@@ -69,30 +61,22 @@ const HomePage = () => {
           <StatsCard
             title="Total"
             statNumber={data?.totalHelpSeekersCount}
-            progress={true}
-            progressNumber={3}
-            icon={<CheckCircle size={40} />}
+            icon={<Venus size={40} />}
           />
           <StatsCard
             title="Ongoing Requests"
             statNumber={data?.ongoingRequestsCount}
-            progress={true}
-            progressNumber={3}
             icon={<CheckCircle size={40} />}
           />
           <StatsCard
             title="Total Requests"
             statNumber={data?.totalRequestsCount}
-            progress={true}
-            progressNumber={3}
-            icon={<CheckCircle size={40} />}
+            icon={<BadgePlus size={40} />}
           />
           <StatsCard
             title="Pending Requests"
             statNumber={data?.pendingNGORequestsCount}
-            progress={true}
-            progressNumber={3}
-            icon={<CheckCircle size={40} />}
+            icon={<Loader size={40} />}
           />
         </div>
       </div>

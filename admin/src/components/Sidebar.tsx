@@ -8,7 +8,6 @@ import {
   HeartHandshake,
   Home,
   LogOut,
-  Settings,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -83,14 +82,7 @@ const Sidebar = () => {
           })}
         </div>
 
-        <div className="mt-70 lg:mt-80">
-          <Link
-            href="/settings"
-            className="flex gap-2 text-sm text-neutral-600 bg-transparent hover:bg-neutral-200 transition px-4 py-3 rounded"
-          >
-            <Settings size={18} />
-            Settings
-          </Link>
+        <div className="mt-50 lg:mt-80">
           <Link
             href="/logout"
             className="flex gap-2 mt-6 text-sm text-neutral-600 bg-transparent hover:bg-neutral-200 transition px-4 py-3 rounded"
