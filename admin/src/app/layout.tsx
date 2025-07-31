@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 
 const urbanist = Urbanist({
   variable: "--font-urbanist",
+  subsets: ["latin", 'latin-ext'],
+  preload: true
 });
 
 export const metadata: Metadata = {

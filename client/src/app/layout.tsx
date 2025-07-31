@@ -6,6 +6,8 @@ import StoreProvider from "@/store/StoreProvider";
 
 const urbanist = Urbanist({
   variable: "--font-urbanist",
+  subsets: ["latin", 'latin-ext'],
+  preload: true
 });
 
 export const metadata: Metadata = {
