@@ -69,7 +69,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex justify-between items-center py-4">
+      <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-2 py-4">
         <Input
           placeholder="Filter names..."
           value={
@@ -80,7 +80,7 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm bg-white"
         />
-        <div className="flex gap-2">
+        <div className="flex flex-col lg:flex-row gap-2">
           <Select
             onValueChange={(value) =>
               table.getColumn("role")?.setFilterValue(value)
